@@ -1,0 +1,17 @@
+**DON'T CHANGE THIS HEADER**
+$Author: Mike Lebson $
+$Revision: 1.18 $
+$Date: 2007/05/04 02:44:45 $
+$Source: /cvs/repo/Acquire/src/ToDo.txt,v $
+
+Things we still need to do:
+
+---------------------------------------------------------------------
+Add algorithm to AIPlayer to allow an actual Computer player to play against.
+---------------------------------------------------------------------
+Add networking and then deal with player creation over a network.
+---------------------------------------------------------------------
+Add information to the new HelpFrame
+---------------------------------------------------------------------
+See TODO in AcquireFrame.
+---------------------------------------------------------------------

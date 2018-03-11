@@ -1,0 +1,634 @@
+NOTE: Change 1 letter of "ChangeLog.txt,v" before you commit to make this work.
+NOTE2: Don't change the $Log: or the other dollar symbol.
+
+Changelog
+-------
+
+$Log: ChangeLog.txt,v $
+Revision 1.145  2007/05/17 00:45:22  Colin
+Fixed merging completely with the help of extensive tracing that I added.
+
+Revision 1.144  2007/05/15 10:55:36  Mike Lebson
+Final Count:
+5542 Lines of code
+23 Classes
+8 Picture files
+3 Organizational Text Files
+
+Revision 1.143  2007/05/15 00:07:31  Mike Lebson
+Turned GAME_TEST off
+
+Revision 1.142  2007/05/14 22:14:48  Mike Lebson
+Fixed a bug where not all of the MDFs were shown.
+Removed all the code related to the code that was causing the problem.
+
+Revision 1.141  2007/05/14 21:45:03  Mike Lebson
+Fixed not being able to buy squares while GAME_TEST was enabled.
+
+Revision 1.140  2007/05/14 21:34:11  Mike Lebson
+Fixed a bug where the End Game button wasn't being enabled when it should have been.
+
+Revision 1.139  2007/05/14 21:18:43  Mike Lebson
+Renamed some variables in the 2nd rules panel to follow the standard of the other one.
+
+Revision 1.138  2007/05/14 21:11:17  Mike Lebson
+Fixed changelog again
+
+Revision 1.137  2007/05/14 21:07:56  Mike Lebson
+Made Rules/How To Play easier to read.
+Added notes about the Majority/Minority leaders to the rules.
+Divided the rules into two panels for ease of readability.
+Fixed a bug where pressing the x on the AboutFrame would close the AcquireFrame as well.
+
+Revision 1.136  2007/05/14 20:47:54  Mike Lebson
+Missing Messages:
+-Mike
+Fixed a bug where the new (+)(-) symbols wouldn't dissapear.
+Fixed a bug where the prices of some companies was 0.
+Fixed a bug where the shares of a company that were sold when a company merged were sold at the company's base price.
+Implemented minority/majority holder bonuses.
+Fixed a bug where minority and majority bonuses woud be wrong because the company's size was wrong.
+Added parentheses to make sure no bugs would occur from order of operations.
+Got rid of some unneeded code.
+Small syntax changes.
+Updated AcquireBugs.txt
+-Colin
+Fixed pricing and stuff
+
+Revision 1.135  2007/05/14 20:47:00  Mike Lebson
+Fixed the changelog
+
+Revision 1.132  2007/05/14 16:52:14  Mike Lebson
+Fixed the game asking if you wanted to buy shares when money == 0
+Added ability to place any square when GAME_TEST = true
+Added ability to place as many squares as you wanted when GAME_TEST = true
+
+Revision 1.131  2007/05/14 16:37:48  Mike Lebson
+Fixed End Game button not being enabled.
+
+Revision 1.130  2007/05/14 16:31:32  Myles
+fixed autoscrolling
+
+Revision 1.129  2007/05/14 13:59:45  Mike Lebson
+Fixed bug where clicked the x in the HelpFrame would close the entire AcquireFrame.
+
+Revision 1.128  2007/05/14 13:56:36  Mike Lebson
+Added HowToPlayPanel and RulesPanel to add text to HelpFrame.
+Changed HelpFrame to use these new panels.
+Removed temporary main from HelpFrame.
+
+Revision 1.127  2007/05/14 02:15:25  Mike Lebson
+Added code that fixed the LogMaster bugs.
+I had to write a new print function specifically for dynamicContent prints, this made it 300x easier to fix the bug.
+I also had to add a "Type" argument to dynamicContent. The types are Buy Sell or ShareS.
+This was necessary for the fixing of the major bug.
+Don't try to understand the code, and PLEASE don't try to change the code.
+Also some minor syntax fixes.
+
+Revision 1.126  2007/05/13 22:44:57  Mike Lebson
+Small syntax changes
+
+Revision 1.125  2007/05/13 20:04:05  Colin
+Made various minor changes to logging.
+
+Revision 1.124  2007/05/13 20:01:46  Mike Lebson
+Updated acquirebugs.txt
+
+Revision 1.123  2007/05/12 12:06:31  Mike Lebson
+no message
+
+Revision 1.122  2007/05/11 16:03:21  Mike Lebson
+Fixed a bug that would replace the wrong line because of some code you removed.
+Applied the same fix to your new function.
+
+Revision 1.121  2007/05/11 15:44:07  Mike Lebson
+Fixed all of your stupid syntax in LogMaster
+
+Revision 1.120  2007/05/11 15:37:41  Mike Lebson
+Added the citation comment back into AcquireFrame by the menu handler.
+They wrote the base code, they get the credit. Leave it there.
+
+Revision 1.119  2007/05/11 15:12:09  Colin
+Fixed a bug where dynamic content was not being cleared at the beginning of each turn.
+
+Revision 1.118  2007/05/11 15:06:14  Colin
+Yum! More LogMaster stuff! It took me so long to type up that thousand-long array with every number from 1 to 1000... just kidding, I did it in excel. It's actually a really cool trick. you do " for a column, then a, then ", then ,, then ", etc, and you do a couple rows like that and then drag it down.
+Also, fixed a bug where players could sell shares at any time. =)
+
+Revision 1.117  2007/05/11 12:58:48  Mike Lebson
+Added code to remove the redundant
+Player bought 1 share(s) of company
+Player bought 2 share(s) of company
+Player bought 3 share(s) of company
+and replace it with just
+Player bought 3 share(s) of company
+It was harder that I thought it would be, but I found the code online.
+I cited it in a comment also.
+
+Revision 1.116  2007/05/08 23:56:29  Mike Lebson
+Fixed a bug where Maj/Min holders weren't being updated after a merge.
+
+Revision 1.115  2007/05/08 23:45:35  Mike Lebson
+Readded code that was preventing multiple messages from being logged in CompanyStatusButton because the way the game runs it cycles through all the CSBs so the same message wasn't happening twice in a row.
+
+Revision 1.114  2007/05/08 23:01:05  Mike Lebson
+Removed code that was preventing multiple messages from being logged now that it is built into the system.
+Fixed a bug where the number of traded shares was wrong.
+Added LogMaster messages for shares traded.
+Added dynamic LogMaster messages for shares sold.
+Removed setMoney() and subtractMoney() from Player.
+Replaced the one setMoney() call with a more appropriate giveMoney() call
+
+Revision 1.113  2007/05/08 21:5343  Colin
+Started implementing dynamic content for LogMaster
+
+Revision 1.112  2007/05/08 20:40:31  Colin
+Added quick change so that messages don't appear repeatedly.
+
+Revision 1.111  2007/05/08 01:33:40  Mike Lebson
+Renamed jScrollPane1 to a meaningful name for the variable (gameLogScrollPanel)
+Made the window a little bigger out the bottom so that the chat wasn't cut off.
+
+Revision 1.110  2007/05/07 12:57:07  Mike Lebson
+Began adding information to the help file.
+
+Revision 1.109  2007/05/07 12:36:33  Mike Lebson
+Updated AcquireBugs.txt
+Fixed a bug where the game was freezing during the selling of shares.
+Eliminated the function that was causing the freeze and used an alternate method to acommplish the same thing.
+Fixed the bug where the end turn button wasn't being disabled when the game wass over.
+Removed an unneeded function from the endGameCheck() in Game
+
+Revision 1.108  2007/05/07 02:46:41  Mike Lebson
+Possibly fixed a bug where the endTurnButton would remain active even when the game was over.
+Updated AcquireBugs.txt
+
+Revision 1.107  2007/05/07 02:29:59  Mike Lebson
+Fixed a bug where you could drop a square you already placed.
+
+Revision 1.106  2007/05/06 18:01:09  Mike Lebson
+Added the ability to save the gameLog to a file into the file menu.
+Fixed a bug where not all shares of every company were being sold at the end of the game.
+Began fixing a bug where the endTurnButton would remain active even when the game was over.
+
+Revision 1.105  2007/05/06 17:38:35  Mike Lebson
+Fixed a bug where varibles weren't being ocmpletely reset when New Game was selected from the menu.
+
+Revision 1.104  2007/05/05 15:09:48  Mike Lebson
+Updated AcquireBugs.txt
+Attemped to fix the bug in AcquireBugs.txt
+Disabled the endTurnButton when the game is over.
+Made the handPanel clickable.
+Added the option to drop unplaceable squares from a player's hand.
+Made the turn button permanently enabled when the player has no squares.
+
+Revision 1.103  2007/05/04 21:34:53  Mike Lebson
+Fixed a future annoyance where the # of squares left in the bag would be wrong because the bag contained unplaceable squares.
+
+Revision 1.102  2007/05/04 21:33:19  Mike Lebson
+Fixed a future bug where unplaceable squares would be taken into a player's hand.
+
+Revision 1.101  2007/05/04 20:23:25  Mike Lebson
+Fixed a bug where "Number of squares left in bag: " wasn't being shown entirely.
+Fixed a bug where "Number of squares left in bag: ##" wasn't being updated correctly.
+Made the squares in HandPanel white if they are not placeable.
+Fixed the spacing of the labels for squares in both the HandPanel and the GridPanel.
+Added a LogMaster message for when a company becomes safe and fixed a bug where it was being called repeatedly.
+Fixed a bug where the PSPs weren't being updated at the end of the game.
+Fixed a bug where the PSPs weren't always being updatedly correctly.
+Made shares unsellable unless a player has placed a square.
+Changed Player.sellShare(Company) to  sellShare(Company c, boolean isMerging) allow merging to bypass this restriction.
+Changed all calls to this function to work correctly.
+Replaced more JOptionPage messages with LogMaster messages.
+Fixed a bug where the LogMaster message wasn't wasn't being called properly for squares placed.
+Fixed a bug where the highlighting of squares wasn't always being reset right when that square was placed.
+
+Revision 1.100  2007/05/04 17:42:42  Colin
+Made the highlighting of the squares thicker and black instead of red.
+
+Revision 1.99  2007/05/04 17:41:36  Colin
+Fixed a bug where the number of buyable stock would decrease even when a player did not buy a stock.
+
+Revision 1.98  2007/05/04 17:40:28  Colin
+Fixed bug where a player couldn't buy a stock of a company when the price of the stock was equal to the amount of money the player had.
+
+Revision 1.97  2007/05/04 17:10:56  Mike Lebson
+Permanently fixed the NullPointerException
+Fixed a bug where the red was not removed 100% 100% of the time.
+
+Revision 1.96  2007/05/04 02:44:45  Mike Lebson
+Updated ToDo.txt
+Added code that may fix a rare duplicate mergeing window bug.
+Re-added the TODO comment to AcquireFrame
+
+Revision 1.95  2007/05/04 02:37:15  Mike Lebson
+Added more log messages.
+Added punctuation to log messages.
+Made the end of the game more neat.
+Made the chat functionable.
+
+Revision 1.94  2007/05/0 01:56:08  Mike Lebson
+Re-added the help thing to the menu.
+NOTE: When fixing the NullPointerException, don't forget to replace all the following code in initComponents:
+        menuItem.setText("File");
+        FileAction fileAction = new FileAction();
+        newGameItem = new JMenuItem("New Game");
+        newGameItem.setMnemonic('N');
+        newGameItem.addActionListener(fileAction);
+        aboutItem = new JMenuItem("About");
+        aboutItem.setMnemonic('A');
+        aboutItem.addActionListener(fileAction);
+        exitItem = new JMenuItem("Exit");
+        exitItem.setMnemonic('x');
+        exitItem.addActionListener(fileAction);
+        menuItem.add(newGameItem);
+        menuItem.add(aboutItem);
+        menuItem.addSeparator();
+        menuItem.add(exitItem);
+        fileMenu.add(menuItem);
+        setJMenuBar(fileMenu);;
+with the method call initMenu();
+
+Revision 1.93  2007/05/04 01:08:00  Colin
+Fixed Ye Old Nulle Pointer Exceptionne.
+
+Revision 1.92  2007/05/04 00:05:43  Colin
+Fixed a bug where players were not getting their initial share (for starting a company). Added some more calls to log. NPE is back.
+
+Revision 1.91  2007/05/03 15:59:07  Mike Lebson
+Re-added help thing to the menu.
+
+Revision 1.90  2007/05/03 13:58:49  Mike Lebson
+Updated ToDo.txt
+Added beginnings of a HelpFrame.
+Added commenting to LogoPanel and HandPanel.
+Added menu item for the HelpFrame.
+Took out menu creation from initComponents() in AcquireFrame and made an initMenu() method for ease of editing.
+Fixed the editing errors in AcquireFrame.
+NullPointerException is back.
+
+Revision 1.89  2007/05/03 12:33:51  Colin
+Added the LogMaster class and started changing error messages to log updates. Mike, you'll have to re-hack AcquireFrame, because when I changed the form it regenerated the code. Also to do: add a little code for chatButtonMouseReleased.
+
+Revision 1.88  2007/05/03 11:21:12  Colin
+Implemented the game rule that players can only buy shares once they've placed a square. All the game rules are implemented now, which means we can actually PLAY a game!
+
+Revision 1.87  2007/05/02 18:42:08  Mike Lebson
+Removed updateSquare(sq) and put the code directly into updateHeldSquares(p)
+Renamed playerHasSquare(sq) to arrayHasSquare(ArrayList<Square>, sq)
+Fixed bug where squares were being added to the bag twice.
+Fixed bug where square wasn't being removed from the player's hand after it was placed.
+Added printAllSquares debug method that prints a player's hand.
+Fixed a bug where squares weren't being unhighlighted properly.
+Fixed a bug where squares weren't being highlighted properly.
+
+Revision 1.86  2007/05/02 17:25:37  Mike Lebson
+Renamed players to myPlayers in Game.
+Changed some syntax around in GridPanel.
+Renamed setHighlighted(b) to isHighlighted(b) in Square.
+Added debugging messages in GridPanel.updateHeldSquares(p)
+Added playerHasSquare(sq) in GridPanel which fixed the not being able to place bug.
+Added updateSquare(sq) in GridPanel which fixed the highlighting bug.
+Added removal of the sq from the active player's hand after he places a square, fixing a bug.
+
+Revision 1.85  2007/05/02 02:12:39  Colin
+Everything for hand is working perfectly, except that squaresHeld isn't filling properly, or it is, but not at some parts? It fills the HandPanel just fine, but then only half of the squares at the most get highlighted, and only the highlighted squares can be placed. So, somehow, half or more of the values in squaresHeld is dissapearing.
+
+Revision 1.84  2007/05/02 00:15:15  Colin
+Fixed bug where squares were being drawn from an empty bag.
+
+Revision 1.83  2007/04/30 22:41:19  Mike Lebson
+Fixed some weirdness that came from Myles' commit.
+
+Revision 1.82  2007/04/30 22:30:19  Myles
+Fixed nullPointerException with respect to GridPanel in AcquireFrame
+Simplified unnessecary/stupid
+
+Revision 1.81  2007/04/30 16:07:26  Mike Lebson
+Renamed drawSquare to takeSquare to make it less confusing.
+Added header to HandPanel.
+Made some variables public that should not have been made private.
+Added getSquares and setSquares in Player.
+Used getSquares and setSquares to made the takeSquare process less convulted and easier to understand.
+
+Revision 1.80  2007/04/30 04:16:57  Colin
+Started implementing bag/hand functionality. Null. Pointer Exception. Tired. Going to. Bed. Night. No bed bugs...
+
+Revision 1.79  2007/04/30 02:18:42  Colin
+Instantianted AcquireFrame earlier in AcquireSetupFrame, reducing hang time substantially.
+
+Revision 1.78  2007/04/28 02:57:38  Mike Lebson
+Updated AcquireBugs
+Fixed the variables not resetting when New Game was chosen from the menu.
+
+Revision 1.77  2007/04/28 02:45:07  Mike Lebson
+Updated AcquireBugs
+Fixed the PlayerStatusPanels not updating bug
+
+Revision 1.76  2007/04/26 19:25:37  Mike Lebson
+Added menu.
+
+Revision 1.75  2007/04/26 18:39:13  Mike Lebson
+Fixed a bug where the game would start even if a RemotePlayer didn't have an IP entered if it was not the last player.
+
+Revision 1.74  2007/04/26 12:51:33  Mike Lebson
+Updated ToDo.txt with things we should add.
+Attempted to fix the updating after merging bug by adding AcquireFrame.updatePSPs();
+Added AboutFrame with information about the game, just click on the Logo.
+Added comment header to LogoPanel
+
+Revision 1.73  2007/04/26 02:41:59  Mike Lebson
+Began fixing playersPanel not updating on company merges.
+Fixed a misupdating Maj/Min holders display.
+
+Revision 1.72  2007/04/26 02:24:57  Mike Lebson
+Made logo transparent
+
+Revision 1.71  2007/04/26 02:14:43  Mike Lebson
+Removed old display of the Majoirty and Minority holders.
+Changed some spacing.
+Added the logo.
+
+Revision 1.70  2007/04/26 01:21:38  Mike Lebson
+Syntax changes
+
+Revision 1.69  2007/04/26 01:06:02  Colin
+-Reworked the code for updateMajorityHolders() to the point of unrecognizability. It works completely now, and is much cleaner and efficient.
+-Added a restriction to buying shares so that the company has to be active to buy shares. Changed the warning message that asked players if "they really wanted to end their turn without buying shares" so it does not show if no shares are available.
+
+Revision 1.68  2007/04/24 21:54:47  Mike Lebson
+Fixed highlighting bug
+Added debug messages to company, printMajHolders() and printMinHolders() to aid in fixing the maj/min bugs.
+
+Revision 1.67  2007/04/24 21:22:58  Colin
+I tried to fix some of the errors that were going on, but all sorts of weirdness has broken loose, and I need a nap.
+
+Revision 1.66  2007/04/24 16:47:31  Mike Lebson
+Fixed duplicate computer names.
+
+Revision 1.65  2007/04/24 16:35:43  Colin
+I attempted to implement a system of displaying the majority and minority leaders. I added get and set methods for is<comp>Majority/MinorityHolder bools in player. then, I added to the updateMajMinHolders in company, so that it sets these bools in player. PlayerSetupPanel checks whether myPlayer is the majority or minority holder of anything, and appends a (+) or (-) to the end of the number of shares.
+It doesn't work. I didn't extensively test, but I think the problem might lie in the system of determining the majority and minority leaders.
+
+Revision 1.64  2007/04/23 23:52:02  Mike Lebson
+Made the PSPs spaced out a small amount more for readbility.
+
+Revision 1.63  2007/04/23 17:54:15  Mike Lebson
+Moved image over a little in CSBs to have it more centered.
+Move the words in the PSPs down to allow a complete box surrounding them during highlighting.
+Updated AcquireBugs.txt and removed an old bug message from GridPanel
+
+Revision 1.62  2007/04/23 12:05:27  Mike Lebson
+Fixed PlayersPanel in AcquireFrame to show PSPs for all active players.
+Fixed highlighting so that it actually works. (Highlights the player whose turn it is)
+Fixed a bug where the first player at the beginning of the game didn't start highlighted.
+
+Revision 1.61  2007/04/23 02:32:54  Mike Lebson
+Colin
+-Added a random name generator for AI players
+-Added PlayersPanel to replace PlayerStatusPanel, re-wrote PlayerStatusPanel to be multiple. *This feature isn't completely working yet, the PSPs won't display*
+-To that end, wrote a method to fill the PlayersPanel with PlayerStatusPanels.
+
+Revision 1.60  2007/04/05 18:24:35  Mike Lebson
+Changed all instances of mouseClicked to mouseReleased
+
+Revision 1.59  2007/04/02 21:15:45  Mike Lebson
+Changed a bit of formatting because I felt like it.
+
+Revision 1.58  2007/04/01 23:52:11  Mike Lebson
+Fixed a bug were turns wouldn't end if someone had bought stock.
+
+Revision 1.57  2007/03/31 02:33:25  Mike Lebson
+Added key listeners for the endTurnButton in AcquireFrame and the goButton in the AcquireSetupFrame.
+The key for ETB is the space bar, the key for the GB is the enter.
+Focus automatically transfers to these buttons at the approprate times.
+**NOTE** AcquireSetupFrame moved from generated to manual editing. I figured that we won't be doing anything really major anyone, so we can just do it manually. Colin, if you can get it to work again, go for it.
+
+Revision 1.56  2007/03/27 13:41:23  Mike Lebson
+Fixed dead square bug. Dead merging is now functional. Allen is a whore.
+
+Revision 1.55  2007/03/26 17:41:26  Mike Lebson
+Updated AcquireBugs
+Added "*SAFE*" message next to the size in the CSB of the companies who are safe
+Made dead squares turn white (Bug with this, see AB.txt)
+
+Revision 1.54  2007/03/26 12:14:12  Mike Lebson
+Added functionality to make it so two or more companies that are safe cannot merge with eachother.
+
+Revision 1.53  2007/03/18 02:35:10  Mike Lebson
+Fixed a bug that would show multiple MergeDialogFrames at once.
+Added some code optimization to ASF to reduce # of lines of code and improve readibility.
+
+Revision 1.52  2007/03/16 15:38:01  Mike Lebson
+Reorganized most of the files and began added commenting.
+
+Revision 1.51  2007/03/16 13:25:02  Mike Lebson
+Changed ending tie message to show that more than two players can play.
+
+Revision 1.50  2007/03/16 13:20:28  Mike Lebson
+Added a title to a message dialog.
+Fixed the pictures not showing up as a result of my attempted fix yesterday.
+
+Revision 1.49  2007/03/16 01:40:27  Mike Lebson
+Moved the EndGame and EndTurn buttons around
+
+Revision 1.48  2007/03/15 20:39:59  Mike Lebson
+Fixed a bug where not all of the players were getting rid of the shares of merging companies
+
+Revision 1.47  2007/03/15 19:00:14  Mike Lebson
+Made the endTurnButton not be enabled until it is usable to coincide with the behavior of the endGameButton
+Updated ToDo.txt
+
+Revision 1.46  2007/03/15 12:13:55  Mike Lebson
+Fixed a bug where names that were entered were accidently disregarded.
+Pre-emptively fixed a bug that did the same thing with IP addresses.
+Disabled the ability to change components of a player (IE: Name, IP) when the player was set as ready.
+
+Revision 1.45  2007/03/13 19:18:38  Mike Lebson
+Mike:
+Fixed some bugs in Colin's code.
+Added functionality to clarify non-named Remote and Computer players.
+Fixed a few other bugs
+Colin:
+Fixed functionality for ending game.
+Added endGameButton and some functionality for turns
+
+Revision 1.44  2007/03/05 20:12:47  Mike Lebson
+Added a method to assign default player names to playesr that don't enter a name.
+
+Revision 1.43  2007/03/04 03:52:16  Mike Lebson
+Fixed a BUNCH of small bugs including, but not limited to:
+-a bug that made squares unplaceable even if you clicked cancel when you were merging
+-a bug that made every merge dialog wrong. (Whoops =P)
+
+Revision 1.42  2007/03/02 18:51:11  Mike Lebson
+Fixed bugs in the merging.
+Removed uneeded SharesPanel.java
+
+Revision 1.41  2007/03/02 15:01:24  Mike Lebson
+Added MergeDialogFrame calls into GridPanel to make it work.
+Changed around a bunch of stuff to fix bugs.
+
+Revision 1.40  2007/03/02 03:37:47  Mike Lebson
+Removed MergeOptionDialog, the old file that i didnt end up using.
+
+Revision 1.39  2007/03/01 03:33:39  Mike Lebson
+Added code bade ofrth e MergeDialogFrame and added all needed methods to Player.
+Didn't do anything to GridPanel, but whatever.
+SharesPanel is the panel that shows the amount of shares the given player has of the given company. There is probably a better way to do this, but this works for now.
+
+Revision 1.38  2007/02/16 13:15:50  Mike Lebson
+Fixed a bug where AI Players were never set to ready and therefore could not be used.
+Fixed a bug where players who weren't active, ie toggle = -1, were still being checked for readiness.
+
+Revision 1.37  2007/02/16 12:56:52  Mike Lebson
+Removed prelim fixing for non-original name because it wasn't working.
+Fixed a bug where if you set a player to ready, then disabled them they still counted as ready.
+
+Revision 1.36  2007/02/16 02:34:30  Mike Lebson
+Added setPlayer() in PlayerSetupPanel and changed getPlayer() to work better with setPlayer()
+Added prelim for fixing the lack of original name.
+
+Revision 1.35  2007/02/16 02:03:00  Mike Lebson
+Took advantage of the fact that all of the Player classes extend Player, and got rid of all the redefinitions.
+
+Revision 1.34  2007/02/16 00:41:04  Mike Lebson
+Commented otu the displaying of the Majority and Minority holders because it doesn't look good right now.
+Fixed a bug where it would go even if not all of the active players were ready.
+Fixed a bug where when it prints out the Majority and Minority holders improperly.
+
+Revision 1.33  2007/02/14 20:40:28  Mike Lebson
+Fixed a few bugs, endGame now works again
+
+Revision 1.32  2007/02/14 19:55:57  Mike Lebson
+Removed some unneeded code.
+Fixed null errors with endGame function by switching players to an ArrayList rather than a queue.
+Still not 100% working, but better
+
+Revision 1.31  2007/02/14 15:00:03  Mike Lebson
+Updated all of the images and fixed the company colors on a few that didn't match.
+Fixed a bug where 1 player could start the game by itself.
+Fixed a bug where the game would start even if not all of the players were ready.
+Started to get rid of the two player thing, but im having trouble with the endGame function. Will work on it more.
+Fixed a small spelling bug and added a title to the setup frame.
+
+Revision 1.30  2007/02/14 04:58:36  Colin
+-Whew! Made a whole bunch of changes. First and foremost, I added the AcquireSetupFrame class (and the PlayerSetupPanel, which it uses), which is a much more efficient way to start a game. Try it out, it should be intuitive. I commented out all the code in GridPanel that was creating the game, just for now. There are only a couple more things to do - set the big toggle buttons to have some sort of picture, add more info on the setup sheet, have options, etc. Myles, your network stuff should work right into that class, or at least a class owned by it.
+-I also started getting rid of the two-player sentiment that was used for testing, and making the game streamlined and efficient. More has to be done to this effect. Also, more work has to be done on the Game class and having it work with the GridPanel so that it really guides the player along and doesn't let him cheat.
+
+Revision 1.29  2007/02/14 02:42:11  Mike Lebson
+Removed unneeded getQuality()
+
+Revision 1.28  2007/02/13 17:22:12  Mike Lebson
+Fixed bug where clicking OK on an input window would allow the user's name or IP to be nothing.
+Added isSafe(b) and isSafe() methods to Company.
+Added making any company of size 11 or greater safe using the check already done in endCheck.
+
+Revision 1.27  2007/02/13 02:17:29  Mike Lebson
+Added public final int to determine the type of player a given player is.
+
+Revision 1.26  2007/02/13 00:42:03  Mike Lebson
+Fixed my own bug with the endGame function. Works great now.
+
+Revision 1.25  2007/02/12 22:17:25  Mike Lebson
+Implemented the endCheck and endGame functions.
+updated the .txt files to show that i implemented it, but there is a bug.
+
+Revision 1.24  2007/02/12 20:17:32  Mike Lebson
+Added placed(boolean) and isPlaced() functions to Company.
+Used these methods to fix a bug where remaking a company after it was destroyed wouldn't award the 1 free stock.
+
+Revision 1.23  2007/02/12 14:00:22  Mike Lebson
+Added code that gives 1 free stock to the player who forms a company, as per the rules of the game.
+
+Revision 1.22  2007/02/12 13:46:37  Mike Lebson
+Fixed a bug where clicking on a square that was already placed would increase the size of the company that occupied it anyway.
+Added code for the end game scenario.
+
+Revision 1.21  2007/02/10 01:38:32  Mike Lebson
+Added message when turn changes
+
+Revision 1.20  2007/02/10 01:34:57  Mike Lebson
+Added imp_icon as a really lame pink crown.
+Remember, these are TEMPORARY icons.
+
+Revision 1.19  2007/02/10 01:29:51  Mike Lebson
+Added ToDo.txt and a blank imp_icon for some reason...
+
+Revision 1.18  2007/02/10 01:18:46  Mike Lebson
+Made Player abstract and made LocalPlayer and AIPlayer
+Added all needed methods to RemotePlayer (for now).
+AIPlayer is empty until we figure out what to do with it.
+Redid stuff to make it work with the new player set up.
+
+Revision 1.17  2007/02/10 00:53:54  Mike Lebson
+Moved some code around and dumped some useless code out
+
+Revision 1.16  2007/02/10 00:03:41  Mike Lebson
+Added header to RemotePlayer, fixed small things in other headers.
+
+Revision 1.15  2007/02/10 00:01:25  Mike Lebson
+Finished the coding for the temporary MergeOptionDialog merging function.
+
+Revision 1.14  2007/02/09 15:04:25  Mike Lebson
+Added support for 2 local players, or 1 local 1 remote.
+
+Revision 1.13  2007/02/08 23:07:56  Mike Lebson
+Added dialog box to ask for the player's name before the game starts.
+Added more code as a basis for the merging dialog
+
+Revision 1.12  2007/02/08 20:54:54  Mike Lebson
+Added basis for the option dialog for what to do with the stocks of a destroyed companies.
+
+Revision 1.11  2007/02/08 17:07:26  Mike Lebson
+Fixed the size of companies not being updated correctly on merges
+
+Revision 1.10  2007/02/08 01:28:56  Mike Lebson
+Forgot to update the AcquireBugs.txt
+
+Revision 1.9  2007/02/08 01:27:32  Mike Lebson
+Fixed the size of companies not reverting to 0 when they are destroyed in a merge.
+Fixed NullPointerException from the code i added earlier.
+
+Revision 1.8  2007/02/08 00:14:30  Mike Lebson
+Fixed size not updating automatically.
+
+Revision 1.7  2007/02/07 14:00:17  Mike Lebson
+Made appropriate variables private and added 1 needed get method to Square.
+
+Revision 1.6  2007/02/07 13:49:45  Mike Lebson
+Fixed bug where the WorldWide image was the only one that showed up when
+the jar was built and then run seperately outside of NetBeans.
+Apparently NetBeans thinks .gif and .GIF are the same thing, whereas Java doesn't.
+Fixed the inputting of the images to reflect the images with .GIF vs. the images with .gif. Works fine now =)
+
+Revision 1.5  2007/02/07 13:40:56  Mike Lebson
+Updated AcquireBugs.txt
+
+Revision 1.4  2007/02/07 13:38:34  Mike Lebson
+Fixed bug where images wouldn't show automatically on load.
+
+Revision 1.3  2007/02/07 13:24:46  Mike Lebson
+Removed TestGridPanel as it is never used.
+Removed latent extra code from AcquireFrame.
+Fixed the bug where canceling a merge would throw a NullPointerException.
+We were tring to toString() a return from JOptionPanel.showInputDialog(...) without
+checking to make sure it wasn't null first.
+I just set the return to an object and toString()'d it if it wasn't null.
+
+Revision 1.2  2007/02/07 12:42:55  Mike Lebson
+Updating changelog (forgot to on last update)
+Added getCompany and getImage methods to CSB
+Added sell ability to the CSBs.
+Left click the CSBs to buy stock, right click to sell.
+
+Revision 1.1  2007/02/05 16:31:51  Mike Lebson
+Added prelim version of the Game class.
+Got rid of some unused code from failed bug fixes
+Fixed name of ChangeLog (random extra ',')
+Updated bug list.
+Added code that now allows the PlayerStatusPanel to update and work correctly.
+
+Revision 1.2  2007/02/04 02:55:41  Mike Lebson
+Added changelog file... again
+

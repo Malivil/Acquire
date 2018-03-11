@@ -286,3 +286,9 @@ __pycache__/
 *.btm.cs
 *.odx.cs
 *.xsd.cs
+/Java/Acquire/build/classes
+/Java/Acquire/dist
+/Java/Acquire/nbproject
+/Java/build/classes
+/Java/dist
+/Java/nbproject

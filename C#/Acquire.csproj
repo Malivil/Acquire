@@ -1,0 +1,208 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{B1B58100-C67B-476B-A31D-7B2EAEBAF291}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Acquire</RootNamespace>
+    <AssemblyName>Acquire</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Frames\AboutFrame.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Frames\AboutFrame.Designer.cs">
+      <DependentUpon>AboutFrame.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Frames\AcquireFrame.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Frames\AcquireFrame.Designer.cs">
+      <DependentUpon>AcquireFrame.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Frames\AcquireSetupFrame.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Frames\AcquireSetupFrame.Designer.cs">
+      <DependentUpon>AcquireSetupFrame.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Models\AIPlayer.cs" />
+    <Compile Include="Forms\BuyShareForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\BuyShareForm.Designer.cs">
+      <DependentUpon>BuyShareForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\ChooseCompanyDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\ChooseCompanyDialog.Designer.cs">
+      <DependentUpon>ChooseCompanyDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Company.cs" />
+    <Compile Include="Components\CompanyStatusButton.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Components\CompanyStatusButton.Designer.cs">
+      <DependentUpon>CompanyStatusButton.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Game.cs" />
+    <Compile Include="Panels\GridPanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Panels\GridPanel.Designer.cs">
+      <DependentUpon>GridPanel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Panels\HandPanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Panels\HandPanel.Designer.cs">
+      <DependentUpon>HandPanel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Frames\HelpFrame.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Frames\HelpFrame.Designer.cs">
+      <DependentUpon>HelpFrame.cs</DependentUpon>
+    </Compile>
+    <Compile Include="LogMaster.cs" />
+    <Compile Include="Forms\MergeDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\MergeDialog.Designer.cs">
+      <DependentUpon>MergeDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Player.cs" />
+    <Compile Include="Panels\PlayerListPanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Panels\PlayerListPanel.Designer.cs">
+      <DependentUpon>PlayerListPanel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Panels\PlayerSetupPanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Panels\PlayerSetupPanel.Designer.cs">
+      <DependentUpon>PlayerSetupPanel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Panels\PlayerStatusPanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Panels\PlayerStatusPanel.Designer.cs">
+      <DependentUpon>PlayerStatusPanel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Models\RemotePlayer.cs" />
+    <Compile Include="Components\Square.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Components\Square.Designer.cs">
+      <DependentUpon>Square.cs</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="Frames\AboutFrame.resx">
+      <DependentUpon>AboutFrame.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Frames\AcquireFrame.resx">
+      <DependentUpon>AcquireFrame.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Frames\AcquireSetupFrame.resx">
+      <DependentUpon>AcquireSetupFrame.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\BuyShareForm.resx">
+      <DependentUpon>BuyShareForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\ChooseCompanyDialog.resx">
+      <DependentUpon>ChooseCompanyDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Components\CompanyStatusButton.resx">
+      <DependentUpon>CompanyStatusButton.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Panels\GridPanel.resx">
+      <DependentUpon>GridPanel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Panels\HandPanel.resx">
+      <DependentUpon>HandPanel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Frames\HelpFrame.resx">
+      <DependentUpon>HelpFrame.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\MergeDialog.resx">
+      <DependentUpon>MergeDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Panels\PlayerListPanel.resx">
+      <DependentUpon>PlayerListPanel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Panels\PlayerSetupPanel.resx">
+      <DependentUpon>PlayerSetupPanel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Panels\PlayerStatusPanel.resx">
+      <DependentUpon>PlayerStatusPanel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="Components\Square.resx">
+      <DependentUpon>Square.cs</DependentUpon>
+    </EmbeddedResource>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
