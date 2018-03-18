@@ -81,6 +81,7 @@ namespace Acquire.Panels
             if (!JoinBox.Checked)
             {
                 ReadyButton.Text = READY;
+                IsHostBox.Checked = false;
             }
         }
 
@@ -98,26 +99,26 @@ namespace Acquire.Panels
             NameBox.Visible = true;
             AINameBox.Enabled = false;
             AINameBox.Visible = false;
-            IPBox.Enabled = false;
+            IPBox.Enabled = JoinBox.Checked;
             IPBox.Visible = false;
             IPLabel.Visible = false;
-            IsHostBox.Enabled = true;
+            IsHostBox.Enabled = JoinBox.Checked;
             IsHostBox.Visible = true;
 
             switch (GetPlayerType())
             {
                 case Player.LOCAL_PLAYER:
-                    NameBox.Enabled = true;
+                    NameBox.Enabled = JoinBox.Checked;
                     break;
                 case Player.REMOTE_PLAYER:
                     NameBox.Enabled = false;
-                    IPBox.Enabled = true;
+                    IPBox.Enabled = JoinBox.Checked;
                     IPBox.Visible = true;
                     IPLabel.Visible = true;
                     NameBox.Text = REMOTE_PLAYER;
                     break;
                 case Player.AI_PLAYER:
-                    AINameBox.Enabled = true;
+                    AINameBox.Enabled = JoinBox.Checked;
                     AINameBox.Visible = true;
                     NameBox.Visible = false;
                     NameBox.Enabled = false;
@@ -183,7 +184,7 @@ namespace Acquire.Panels
         /// 
         /// <param name="sender">The object sending the event</param>
         /// <param name="args">The arguments sent</param>
-        private void chkIsHost_CheckedChanged(object sender, EventArgs args)
+        private void IsHostBox_CheckedChanged(object sender, EventArgs args)
         {
             if (!(PlayerHostStatusChanged?.Invoke(this, IsHostBox.Checked) ?? true))
             {

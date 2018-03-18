@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
-using Acquire.Forms;
 using Acquire.Models;
 using Acquire.Panels;
 
@@ -26,11 +26,20 @@ namespace Acquire.Frames
 
         #region Private Member Variables
 
+        // Whether this game already has a host
+        private bool HasHost => !string.IsNullOrWhiteSpace(hostPlayerId);
+
         // What the host of this game's name is
         private string hostPlayerId;
 
-        // Whether this game already has a host
-        private bool hasHost => !string.IsNullOrWhiteSpace(hostPlayerId);
+        // Whether the host player is a local player or not
+        private bool isHostLocal;
+
+        // The original size of this frame
+        private Size originalSize;
+
+        // The size of the remote connection status window
+        private const int remoteStatusWidth = 285;
 
         #endregion
 
@@ -40,6 +49,7 @@ namespace Acquire.Frames
         public AcquireSetupFrame()
         {
             InitializeComponent();
+            originalSize = Size;
         }
 
         #region Event Handlers
@@ -52,11 +62,6 @@ namespace Acquire.Frames
         /// <param name="args">The arguments sent</param>
         private void StartButton_Click(object sender, EventArgs args)
         {
-            // How many AI players we have
-            int aiPlayers = 0;
-            // How many remote players we have
-            int remotePlayers = 0;
-
             // Create a list of the PSPs to make it easier and quicker to run the same code on each
             IEnumerable<PlayerSetupPanel> setupPanels = Controls.OfType<PlayerSetupPanel>();
             // Clear the current list of players
@@ -127,7 +132,7 @@ namespace Acquire.Frames
                 }
 
                 // Make sure we have a host if we have remote players
-                if (Players.Any(p => p.Type == Player.REMOTE_PLAYER) && !hasHost)
+                if (Players.Any(p => p.Type == Player.REMOTE_PLAYER) && !HasHost)
                 {
                     MessageBox.Show(@"There are remote players listed but no host selected. Please select a host", @"No host selected", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
@@ -164,23 +169,6 @@ namespace Acquire.Frames
                 {
                     args.Cancel = true;
                     IsStarting = false;
-                    return;
-                }
-
-                // Don't launch the remote setup dialog if there are no remote players
-                if (Players.All(p => p.Type != Player.REMOTE_PLAYER))
-                {
-                    return;
-                }
-
-                // Launch the remote setup dialog
-                RemoteSetupDialog remoteDialog = new RemoteSetupDialog(Players);
-                if (remoteDialog.ShowDialog() != DialogResult.OK)
-                {
-                    MessageBox.Show(remoteDialog.GetErrorMessage(), @"Error starting the game", MessageBoxButtons.OK, MessageBoxIcon.Error);
-
-                    args.Cancel = true;
-                    IsStarting = false;
                 }
             }
             // Otherwise only close it if the user wants to.
@@ -200,7 +188,7 @@ namespace Acquire.Frames
         /// <returns>True if the panel successfully claimed or released hosting rights, false otherwise</returns>
         private bool PlayerSetupPanel_PlayerHostStatusChanged(PlayerSetupPanel sender, bool isHost)
         {
-            if (hasHost && isHost)
+            if (HasHost && isHost)
             {
                 return false;
             }
@@ -208,13 +196,45 @@ namespace Acquire.Frames
             if (isHost)
             {
                 hostPlayerId = sender.PlayerId;
+                isHostLocal = sender.GetPlayerType() == Player.LOCAL_PLAYER;
             }
-            else if (hostPlayerId != sender.PlayerId)
+            else if (hostPlayerId == sender.PlayerId)
             {
                 hostPlayerId = null;
+                isHostLocal = false;
+            }
+
+            // If this isn't a local host and we have an open server, close it
+            if (!isHostLocal && CloseServerButton.Enabled)
+            {
+                CloseServerButton.PerformClick();
+                OpenServerButton.Visible = false;
+                OpenServerButton.Enabled = false;
+            }
+            else
+            {
+                OpenServerButton.Visible = true;
+                OpenServerButton.Enabled = true;
             }
 
             return true;
+        }
+
+        private void OpenServerButton_Click(object sender, EventArgs e)
+        {
+            MaximumSize = new Size(Size.Width + remoteStatusWidth, Size.Height);
+            Size = MaximumSize;
+            MinimumSize = MaximumSize;
+            OpenServerButton.Enabled = false;
+        }
+
+        private void CloseServerButton_Click(object sender, EventArgs e)
+        {
+            MinimumSize = originalSize;
+            Size = originalSize;
+            MaximumSize = originalSize;
+            OpenServerButton.Visible = true;
+            OpenServerButton.Enabled = true;
         }
 
         #endregion

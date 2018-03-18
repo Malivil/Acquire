@@ -179,6 +179,7 @@
             // IsHostBox
             // 
             this.IsHostBox.AutoSize = true;
+            this.IsHostBox.Enabled = false;
             this.IsHostBox.Font = new System.Drawing.Font("Trebuchet MS", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.IsHostBox.Location = new System.Drawing.Point(10, 34);
             this.IsHostBox.Name = "IsHostBox";
@@ -186,7 +187,7 @@
             this.IsHostBox.TabIndex = 9;
             this.IsHostBox.Text = "Is Host?";
             this.IsHostBox.UseVisualStyleBackColor = true;
-            this.IsHostBox.CheckedChanged += new System.EventHandler(this.chkIsHost_CheckedChanged);
+            this.IsHostBox.CheckedChanged += new System.EventHandler(this.IsHostBox_CheckedChanged);
             // 
             // PlayerSetupPanel
             // 

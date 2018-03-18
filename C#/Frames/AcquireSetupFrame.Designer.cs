@@ -39,11 +39,14 @@ namespace Acquire.Frames
             this.PlayerSetupPanel3 = new Acquire.Panels.PlayerSetupPanel();
             this.PlayerSetupPanel2 = new Acquire.Panels.PlayerSetupPanel();
             this.PlayerSetupPanel1 = new Acquire.Panels.PlayerSetupPanel();
+            this.RemoteStatusBox = new System.Windows.Forms.ListBox();
+            this.OpenServerButton = new System.Windows.Forms.Button();
+            this.CloseServerButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // StartButton
             // 
-            this.StartButton.Location = new System.Drawing.Point(12, 426);
+            this.StartButton.Location = new System.Drawing.Point(12, 414);
             this.StartButton.Name = "StartButton";
             this.StartButton.Size = new System.Drawing.Size(75, 23);
             this.StartButton.TabIndex = 8;
@@ -54,7 +57,7 @@ namespace Acquire.Frames
             // PlayerSetupPanel8
             // 
             this.PlayerSetupPanel8.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.PlayerSetupPanel8.Location = new System.Drawing.Point(436, 318);
+            this.PlayerSetupPanel8.Location = new System.Drawing.Point(436, 311);
             this.PlayerSetupPanel8.MaximumSize = new System.Drawing.Size(416, 94);
             this.PlayerSetupPanel8.MinimumSize = new System.Drawing.Size(416, 94);
             this.PlayerSetupPanel8.Name = "PlayerSetupPanel8";
@@ -65,7 +68,7 @@ namespace Acquire.Frames
             // PlayerSetupPanel7
             // 
             this.PlayerSetupPanel7.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.PlayerSetupPanel7.Location = new System.Drawing.Point(12, 318);
+            this.PlayerSetupPanel7.Location = new System.Drawing.Point(12, 311);
             this.PlayerSetupPanel7.MaximumSize = new System.Drawing.Size(416, 94);
             this.PlayerSetupPanel7.MinimumSize = new System.Drawing.Size(416, 94);
             this.PlayerSetupPanel7.Name = "PlayerSetupPanel7";
@@ -76,7 +79,7 @@ namespace Acquire.Frames
             // PlayerSetupPanel6
             // 
             this.PlayerSetupPanel6.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.PlayerSetupPanel6.Location = new System.Drawing.Point(436, 216);
+            this.PlayerSetupPanel6.Location = new System.Drawing.Point(436, 210);
             this.PlayerSetupPanel6.MaximumSize = new System.Drawing.Size(416, 94);
             this.PlayerSetupPanel6.MinimumSize = new System.Drawing.Size(416, 94);
             this.PlayerSetupPanel6.Name = "PlayerSetupPanel6";
@@ -87,7 +90,7 @@ namespace Acquire.Frames
             // PlayerSetupPanel5
             // 
             this.PlayerSetupPanel5.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.PlayerSetupPanel5.Location = new System.Drawing.Point(12, 216);
+            this.PlayerSetupPanel5.Location = new System.Drawing.Point(12, 210);
             this.PlayerSetupPanel5.MaximumSize = new System.Drawing.Size(416, 94);
             this.PlayerSetupPanel5.MinimumSize = new System.Drawing.Size(416, 94);
             this.PlayerSetupPanel5.Name = "PlayerSetupPanel5";
@@ -98,7 +101,7 @@ namespace Acquire.Frames
             // PlayerSetupPanel4
             // 
             this.PlayerSetupPanel4.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.PlayerSetupPanel4.Location = new System.Drawing.Point(436, 114);
+            this.PlayerSetupPanel4.Location = new System.Drawing.Point(436, 111);
             this.PlayerSetupPanel4.MaximumSize = new System.Drawing.Size(416, 94);
             this.PlayerSetupPanel4.MinimumSize = new System.Drawing.Size(416, 94);
             this.PlayerSetupPanel4.Name = "PlayerSetupPanel4";
@@ -109,7 +112,7 @@ namespace Acquire.Frames
             // PlayerSetupPanel3
             // 
             this.PlayerSetupPanel3.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.PlayerSetupPanel3.Location = new System.Drawing.Point(12, 114);
+            this.PlayerSetupPanel3.Location = new System.Drawing.Point(12, 111);
             this.PlayerSetupPanel3.MaximumSize = new System.Drawing.Size(416, 94);
             this.PlayerSetupPanel3.MinimumSize = new System.Drawing.Size(416, 94);
             this.PlayerSetupPanel3.Name = "PlayerSetupPanel3";
@@ -139,11 +142,44 @@ namespace Acquire.Frames
             this.PlayerSetupPanel1.TabIndex = 0;
             this.PlayerSetupPanel1.PlayerHostStatusChanged += new Acquire.Panels.PlayerSetupPanel.OnPlayerHostStatusChanged(this.PlayerSetupPanel_PlayerHostStatusChanged);
             // 
+            // RemoteStatusBox
+            // 
+            this.RemoteStatusBox.FormattingEnabled = true;
+            this.RemoteStatusBox.Location = new System.Drawing.Point(869, 11);
+            this.RemoteStatusBox.Name = "RemoteStatusBox";
+            this.RemoteStatusBox.Size = new System.Drawing.Size(268, 394);
+            this.RemoteStatusBox.TabIndex = 9;
+            // 
+            // OpenServerButton
+            // 
+            this.OpenServerButton.Enabled = false;
+            this.OpenServerButton.Location = new System.Drawing.Point(682, 414);
+            this.OpenServerButton.Name = "OpenServerButton";
+            this.OpenServerButton.Size = new System.Drawing.Size(170, 23);
+            this.OpenServerButton.TabIndex = 10;
+            this.OpenServerButton.Text = "Begin Listening for Connections";
+            this.OpenServerButton.UseVisualStyleBackColor = true;
+            this.OpenServerButton.Visible = false;
+            this.OpenServerButton.Click += new System.EventHandler(this.OpenServerButton_Click);
+            // 
+            // CloseServerButton
+            // 
+            this.CloseServerButton.Location = new System.Drawing.Point(975, 414);
+            this.CloseServerButton.Name = "CloseServerButton";
+            this.CloseServerButton.Size = new System.Drawing.Size(162, 23);
+            this.CloseServerButton.TabIndex = 11;
+            this.CloseServerButton.Text = "Stop Listening for Connections";
+            this.CloseServerButton.UseVisualStyleBackColor = true;
+            this.CloseServerButton.Click += new System.EventHandler(this.CloseServerButton_Click);
+            // 
             // AcquireSetupFrame
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(868, 457);
+            this.ClientSize = new System.Drawing.Size(865, 447);
+            this.Controls.Add(this.CloseServerButton);
+            this.Controls.Add(this.OpenServerButton);
+            this.Controls.Add(this.RemoteStatusBox);
             this.Controls.Add(this.StartButton);
             this.Controls.Add(this.PlayerSetupPanel8);
             this.Controls.Add(this.PlayerSetupPanel7);
@@ -154,8 +190,6 @@ namespace Acquire.Frames
             this.Controls.Add(this.PlayerSetupPanel2);
             this.Controls.Add(this.PlayerSetupPanel1);
             this.MaximizeBox = false;
-            this.MaximumSize = new System.Drawing.Size(884, 496);
-            this.MinimumSize = new System.Drawing.Size(884, 496);
             this.Name = "AcquireSetupFrame";
             this.Text = "New Game of Acquire in C#";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.AcquireSetupFrame_FormClosing);
@@ -174,5 +208,8 @@ namespace Acquire.Frames
         private PlayerSetupPanel PlayerSetupPanel7;
         private PlayerSetupPanel PlayerSetupPanel8;
         private System.Windows.Forms.Button StartButton;
+        private System.Windows.Forms.ListBox RemoteStatusBox;
+        private System.Windows.Forms.Button OpenServerButton;
+        private System.Windows.Forms.Button CloseServerButton;
     }
 }
