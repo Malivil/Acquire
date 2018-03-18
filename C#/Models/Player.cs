@@ -9,9 +9,9 @@ namespace Acquire.Models
         #region Constants
 
         // A static variable representing the type of this player
-        public const int LOCAL_PLAYER = 1;
-        public const int REMOTE_PLAYER = 2;
-        public const int AI_PLAYER = 3;
+        public const int LOCAL_PLAYER = 0;
+        public const int REMOTE_PLAYER = 1;
+        public const int AI_PLAYER = 2;
 
         #endregion
 
@@ -37,6 +37,11 @@ namespace Acquire.Models
         /// This player's name
         /// </summary>
         public string Name { get; }
+
+        /// <summary>
+        /// This player's Unique ID
+        /// </summary>
+        public string PlayerId { get; }
 
         /// <summary>
         /// The type of player this is
@@ -69,12 +74,12 @@ namespace Acquire.Models
         /// 
         /// <param name="name">The name of the player being created.</param>
         /// <param name="type">The type of this player.</param>
-        public Player(string name, int type)
+        /// <param name="playerId">The unique id of this player.</param>
+        public Player(string name, int type, string playerId)
         {
-            // Store the pPlayer's name
             Name = name;
-            // Store the pPlayer's szType
             Type = type;
+            PlayerId = playerId;
 
             // Initialize all of the companies
             foreach (Company company in Game.Companies)
@@ -126,13 +131,19 @@ namespace Acquire.Models
                         Game.OwnerFrame.UpdatePlayerList();
                     }
                     else
+                    {
                         LogMaster.Log("Not enough money to buy a share.");
+                    }
                 }
                 else
+                {
                     LogMaster.Log("Not enough shares to buy.");
+                }
             }
             else
+            {
                 LogMaster.Log("Place a square first!");
+            }
         }
 
         /// <summary>
@@ -161,10 +172,14 @@ namespace Acquire.Models
                     SetShares(company, GetShares(company) - 1);
                 }
                 else
+                {
                     LogMaster.Log($"You don't have any shares of {company.GetName()} to sell.");
+                }
             }
             else
+            {
                 LogMaster.Log("Place a square first!");
+            }
         }
 
         /// <summary>
@@ -178,7 +193,9 @@ namespace Acquire.Models
         public void SellShares(Company company, int numShares, bool isMerging)
         {
             for (int i = 0; i < numShares; i++)
+            {
                 SellShare(company, isMerging, company.Size);
+            }
         }
 
         /// <summary>
@@ -252,7 +269,9 @@ namespace Acquire.Models
             for (int i = 0; i < Squares.Count; i++)
             {
                 if (Squares[i].GetState() == Square.STATE_DEAD)
+                {
                     Squares.RemoveAt(i);
+                }
             }
         }
 

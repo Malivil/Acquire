@@ -1,5 +1,7 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Windows.Forms;
+using Acquire.Models;
 
 namespace Acquire.Panels
 {
@@ -7,11 +9,26 @@ namespace Acquire.Panels
     {
         #region Constants
 
-        private const string CONNECT = "Connect";
-        private const string CONNECTED = "Connected";
-        private const string RETRY = "Retry";
         private const string READY = "Ready";
         private const string UNREADY = "Un-Ready";
+        private const string REMOTE_PLAYER = "Remote Player";
+
+        #endregion
+
+        #region Public Member Variables
+
+        /// <summary>
+        /// This player's Unique ID
+        /// </summary>
+        public string PlayerId = Guid.NewGuid().ToString("N");
+
+        #endregion
+
+        #region Events
+
+        public delegate bool OnPlayerHostStatusChanged(PlayerSetupPanel sender, bool isHost);
+        [Browsable(true)]
+        public event OnPlayerHostStatusChanged PlayerHostStatusChanged;
 
         #endregion
 
@@ -23,30 +40,8 @@ namespace Acquire.Panels
             InitializeComponent();
 
             AINameBox.SelectedIndex = 0;
-            TypeBox.SelectedIndex = 0;
+            TypeBox.SelectedIndex = Player.LOCAL_PLAYER;
         }
-
-        /// <summary>
-        /// Connects to the remote player and returns the connection status.
-        /// </summary>
-        /// 
-        /// <returns>The connection status.</returns>
-        private string ConnectToRemote()
-        {
-            if (System.Net.NetworkInformation.NetworkInterface.GetIsNetworkAvailable())
-            {
-                ReadyButton.Enabled = false;
-                return CONNECTED;
-            }
-
-            MessageBox.Show(@"Connection Failed: There is no network connection available.", @"No Network Connection", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            return RETRY;
-        }
-
-        /// <summary>
-        ///  Disconnects from remote player represented by this panel.
-        /// </summary>
-        private void DisconnectFromRemote() { }
 
         #region Event Handlers
 
@@ -64,17 +59,18 @@ namespace Acquire.Panels
             IPLabel.Enabled = JoinBox.Checked;
             TypeLabel.Enabled = JoinBox.Checked;
 
-            if (TypeBox.SelectedIndex != 2)
-            {
-                NameBox.Enabled = JoinBox.Checked;
-                AINameBox.Enabled = false;
-                AINameBox.Visible = false;
-            }
-            else
+            // If this is an AI
+            if (TypeBox.SelectedIndex == Player.AI_PLAYER)
             {
                 NameBox.Enabled = false;
                 AINameBox.Enabled = JoinBox.Checked;
                 AINameBox.Visible = true;
+            }
+            else
+            {
+                NameBox.Enabled = JoinBox.Checked;
+                AINameBox.Enabled = false;
+                AINameBox.Visible = false;
             }
 
             if (!JoinBox.Checked)
@@ -91,39 +87,37 @@ namespace Acquire.Panels
         /// <param name="args">The arguments sent</param>
         private void TypeBox_SelectedIndexChanged(object sender, EventArgs args)
         {
-            if (ReadyButton.Text.Equals(CONNECTED))
-            {
-                DisconnectFromRemote();
-            }
-
             ReadyButton.Enabled = JoinBox.Checked;
             ReadyButton.Text = READY;
             NameBox.Text = string.Empty;
+            NameBox.Visible = true;
+            AINameBox.Enabled = false;
+            AINameBox.Visible = false;
+            IPBox.Enabled = false;
+            IPBox.Visible = false;
+            IPLabel.Visible = false;
+            IsHost.Enabled = true;
+            IsHost.Visible = true;
 
             switch (TypeBox.SelectedIndex)
             {
-                case 0: // Local Player
-                    AINameBox.Enabled = false;
-                    AINameBox.Visible = false;
-                    NameBox.Visible = true;
+                case Player.LOCAL_PLAYER:
                     NameBox.Enabled = true;
-                    IPBox.Enabled = false;
                     break;
-                case 1: // Remote Player
-                    AINameBox.Enabled = false;
-                    AINameBox.Visible = false;
-                    NameBox.Visible = true;
+                case Player.REMOTE_PLAYER:
                     NameBox.Enabled = false;
                     IPBox.Enabled = true;
-                    NameBox.Text = GetRemoteName();
-                    ReadyButton.Text = CONNECT;
+                    IPBox.Visible = true;
+                    IPLabel.Visible = true;
+                    NameBox.Text = REMOTE_PLAYER;
                     break;
-                case 2: // AI Player
+                case Player.AI_PLAYER:
                     AINameBox.Enabled = true;
                     AINameBox.Visible = true;
                     NameBox.Visible = false;
                     NameBox.Enabled = false;
-                    IPBox.Enabled = false;
+                    IsHost.Enabled = false;
+                    IsHost.Visible = false;
                     break;
             }
         }
@@ -136,12 +130,7 @@ namespace Acquire.Panels
         /// <param name="args">The arguments sent</param>
         private void ReadyButton_Click(object sender, EventArgs args)
         {
-            if (!ReadyButton.Enabled)
-            {
-                return;
-            }
-
-            if (TypeBox.SelectedIndex == 0 && NameBox.Text.Length == 0)
+            if (TypeBox.SelectedIndex == Player.LOCAL_PLAYER && string.IsNullOrWhiteSpace(NameBox.Text))
             {
                 MessageBox.Show(@"This player doesn't have a name yet.", @"Please enter a name", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 return;
@@ -152,37 +141,49 @@ namespace Acquire.Panels
             IPLabel.Enabled = !ReadyButton.Text.Equals(READY);
             TypeLabel.Enabled = !ReadyButton.Text.Equals(READY);
 
-            if (TypeBox.SelectedIndex != 2)
+            // If this is an AI
+            if (TypeBox.SelectedIndex == Player.AI_PLAYER)
             {
-                if (TypeBox.SelectedIndex == 0)
+                AINameBox.Enabled = !ReadyButton.Text.Equals(READY);
+                AINameBox.Visible = true;
+                NameBox.Enabled = false;
+                IPBox.Enabled = false;
+            }
+            else
+            {
+                AINameBox.Enabled = false;
+                AINameBox.Visible = false;
+
+                // If this is a local user
+                if (TypeBox.SelectedIndex == Player.LOCAL_PLAYER)
                 {
                     NameBox.Enabled = !ReadyButton.Text.Equals(READY);
                     IPBox.Enabled = false;
                 }
+                // If this is a remote user
                 else
                 {
                     NameBox.Enabled = false;
                     IPBox.Enabled = !ReadyButton.Text.Equals(READY);
                 }
-
-                AINameBox.Enabled = false;
-                AINameBox.Visible = false;
-            }
-            else
-            {
-                NameBox.Enabled = false;
-                IPBox.Enabled = false;
-                AINameBox.Enabled = !ReadyButton.Text.Equals(READY);
-                AINameBox.Visible = true;
-            }
-
-            if (TypeBox.SelectedIndex == 1)
-            {
-                ReadyButton.Text = ConnectToRemote();
-                return;
             }
 
             ReadyButton.Text = ReadyButton.Text.Equals(READY) ? UNREADY : READY;
+        }
+
+        /// <summary>
+        /// Lets all listeners know when this player's host status has changed. Used for validation.
+        /// </summary>
+        /// 
+        /// <param name="sender">The object sending the event</param>
+        /// <param name="args">The arguments sent</param>
+        private void chkIsHost_CheckedChanged(object sender, EventArgs args)
+        {
+            if (!(PlayerHostStatusChanged?.Invoke(this, IsHost.Checked) ?? true))
+            {
+                MessageBox.Show(@"There is already a host for this game.", @"Game already has host", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                IsHost.Checked = false;
+            }
         }
 
         #endregion
@@ -198,22 +199,20 @@ namespace Acquire.Panels
         /// <returns>The name of this player.</returns>
         public string GetName()
         {
-            // Local or Remote Player
-            if (TypeBox.SelectedIndex != 2)
+            // AI Player
+            if (TypeBox.SelectedIndex == Player.AI_PLAYER)
             {
-                if (NameBox.Text.Length > 0)
-                {
-                    return NameBox.Text;
-                }
-                return TypeBox.SelectedIndex == 1 ? "Player" : "Remote Player";
+                // Either get the chosen name or a random one if one wasn't chosen
+                int aiIndex = AINameBox.SelectedIndex > 0 ? AINameBox.SelectedIndex : new Random().Next(1, AINameBox.Items.Count - 1);
+                return AINameBox.Items[aiIndex].ToString();
             }
 
-            // AI Player
-            if (AINameBox.SelectedIndex > 0)
+            // Local or Remote Player
+            if (!string.IsNullOrWhiteSpace(NameBox.Text))
             {
-                return AINameBox.Items[AINameBox.SelectedIndex].ToString();
+                return NameBox.Text;
             }
-            return AINameBox.Items[new Random().Next(1, AINameBox.Items.Count - 1)].ToString();
+            return TypeBox.SelectedIndex == Player.LOCAL_PLAYER ? "Player" : REMOTE_PLAYER;
         }
 
         /// <summary>
@@ -221,7 +220,7 @@ namespace Acquire.Panels
         /// </summary>
         /// 
         /// <returns>The type of the player represented by this panel</returns>
-        public int GetPlayerType() => TypeBox.SelectedIndex + 1;
+        public int GetPlayerType() => TypeBox.SelectedIndex;
 
         /// <summary>
         /// Returns the IP address for the player represented by this panel.
@@ -229,13 +228,6 @@ namespace Acquire.Panels
         /// 
         /// <returns>The IP address for the player represented by this panel.</returns>
         public string GetAddress() => IPBox.Text;
-
-        /// <summary>
-        /// Fetches and returns the name of the remote player represented by this panel.
-        /// </summary>
-        /// 
-        /// <returns>The name of the remote player represented by this panel.</returns>
-        public string GetRemoteName() => "Remote";
 
         #endregion
 

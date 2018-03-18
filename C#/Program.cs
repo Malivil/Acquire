@@ -19,8 +19,8 @@ namespace Acquire
             AcquireSetupFrame asfFrame = new AcquireSetupFrame();
             Application.Run(asfFrame);
 
-            // If we have players, start the game
-            if (asfFrame.Players.Count > 1)
+            // If we have players and we're supposed to start, start the game
+            if (asfFrame.IsStarting && asfFrame.Players.Count > 1)
             {
                 Application.Run(new AcquireFrame(asfFrame.Players));
             }

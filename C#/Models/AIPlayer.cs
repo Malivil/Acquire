@@ -10,7 +10,8 @@ namespace Acquire.Models
         /// </summary>
         /// 
         /// <param name="name">The name to give this AI player</param>
-        public AiPlayer(string name) : base(name, AI_PLAYER) { }
+        /// <param name="playerId">The unique id of this player.</param>
+        public AiPlayer(string name, string playerId) : base(name, AI_PLAYER, playerId) { }
 
         #region Action Methods
 

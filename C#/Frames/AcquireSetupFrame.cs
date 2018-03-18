@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
 using Acquire.Models;
 using Acquire.Panels;
@@ -15,15 +16,20 @@ namespace Acquire.Frames
         /// </summary>
         public List<Player> Players { get; } = new List<Player>();
 
+        /// <summary>
+        /// Whether or not we are starting the game
+        /// </summary>
+        public bool IsStarting { get; private set; }
+
         #endregion
 
         #region Private Member Variables
 
-        // Whether or not we are starting the game
-        private bool isStarting;
+        // What the host of this game's name is
+        private string hostPlayerId;
 
-        // The list of current player names (to eliminate duplicates)
-        private readonly List<string> playerNames = new List<string>();
+        // Whether this game already has a host
+        private bool hasHost => !string.IsNullOrWhiteSpace(hostPlayerId);
 
         #endregion
 
@@ -47,22 +53,15 @@ namespace Acquire.Frames
         {
             // How many AI players we have
             int aiPlayers = 0;
+            // How many remote players we have
+            int remotePlayers = 0;
+
             // Create a list of the PSPs to make it easier and quicker to run the same code on each
-            List<PlayerSetupPanel> setupPanels = new List<PlayerSetupPanel>
-            {
-                PlayerSetupPanel1,
-                PlayerSetupPanel2,
-                PlayerSetupPanel3,
-                PlayerSetupPanel5,
-                PlayerSetupPanel5,
-                PlayerSetupPanel6,
-                PlayerSetupPanel7,
-                PlayerSetupPanel8
-            };
+            IEnumerable<PlayerSetupPanel> setupPanels = Controls.OfType<PlayerSetupPanel>();
             // Clear the current list of players
             Players.Clear();
-            // Clear the current list of player names
-            playerNames.Clear();
+            // The list of current player names (to eliminate duplicates)
+            List<string> playerNames = new List<string>();
 
             // For each panel...
             foreach (PlayerSetupPanel panel in setupPanels)
@@ -88,6 +87,8 @@ namespace Acquire.Frames
                     return;
                 }
 
+                // TODO: Figure out how to handle this for remote players. Maybe have it as part of the handshake and force a remote player to append a number then?
+
                 // Get the current name
                 string name = panel.GetName();
 
@@ -111,16 +112,17 @@ namespace Acquire.Frames
                 // Create the player of the correct type
                 if (panel.GetPlayerType() == Player.LOCAL_PLAYER)
                 {
-                    Players.Add(new Player(name, Player.LOCAL_PLAYER));
+                    Players.Add(new Player(name, Player.LOCAL_PLAYER, panel.PlayerId));
                 }
                 else if (panel.GetPlayerType() == Player.REMOTE_PLAYER)
                 {
-                    Players.Add(new RemotePlayer(name, panel.GetAddress()));
+                    remotePlayers++;
+                    Players.Add(new RemotePlayer(name, panel.PlayerId, panel.GetAddress()));
                 }
                 else
                 {
                     aiPlayers++;
-                    Players.Add(new AiPlayer(name));
+                    Players.Add(new AiPlayer(name, panel.PlayerId));
                 }
             }
 
@@ -136,7 +138,14 @@ namespace Acquire.Frames
                     }
                 }
 
-                isStarting = true;
+                // Make sure we have a host if we have remote players
+                if (remotePlayers > 0 && !hasHost)
+                {
+                    MessageBox.Show(@"There are remote players listed but no host selected. Please select a host", @"No host selected", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                IsStarting = true;
                 Close();
             }
             else
@@ -155,23 +164,53 @@ namespace Acquire.Frames
         {
             // If windows is shutting down, close it.
             if (args.CloseReason == CloseReason.WindowsShutDown)
+            {
                 return;
+            }
 
             // If we are trying to start
-            if (isStarting)
+            if (IsStarting)
             {
                 // Make sure the user really wants it
                 if (MessageBox.Show(@"Are you sure you want to start?", @"Are you sure?", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
                 {
                     args.Cancel = true;
-                    isStarting = false;
+                    IsStarting = false;
                 }
             }
             // Otherwise only close it if the user wants to.
             else if (MessageBox.Show(@"Are you sure you want to quit?", @"Are you sure?", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
             {
                 args.Cancel = true;
+                IsStarting = false;
             }
+        }
+
+        /// <summary>
+        /// Handles event where a player is either claiming or releasing hosting rights for this game
+        /// </summary>
+        ///
+        /// <param name="sender">The panel sending the event</param>
+        /// <param name="isHost">Whether the sending panel is trying to claim host of this game</param>
+        ///
+        /// <returns>True if the panel successfully claimed or released hosting rights, false otherwise</returns>
+        private bool PlayerSetupPanel_PlayerHostStatusChanged(PlayerSetupPanel sender, bool isHost)
+        {
+            if (hasHost && isHost)
+            {
+                return false;
+            }
+
+            if (isHost)
+            {
+                hostPlayerId = sender.PlayerId;
+            }
+            else if (hostPlayerId != sender.PlayerId)
+            {
+                hostPlayerId = null;
+            }
+
+            return true;
         }
 
         #endregion

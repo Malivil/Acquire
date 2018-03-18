@@ -37,6 +37,7 @@
             this.TypeBox = new System.Windows.Forms.ComboBox();
             this.IPBox = new System.Windows.Forms.TextBox();
             this.AINameBox = new System.Windows.Forms.ComboBox();
+            this.IsHost = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // ReadyButton
@@ -79,9 +80,9 @@
             this.NameLabel.Font = new System.Drawing.Font("Trebuchet MS", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.NameLabel.Location = new System.Drawing.Point(158, 9);
             this.NameLabel.Name = "NameLabel";
-            this.NameLabel.Size = new System.Drawing.Size(90, 18);
+            this.NameLabel.Size = new System.Drawing.Size(47, 18);
             this.NameLabel.TabIndex = 3;
-            this.NameLabel.Text = "Player Name:";
+            this.NameLabel.Text = "Name:";
             // 
             // TypeLabel
             // 
@@ -90,9 +91,9 @@
             this.TypeLabel.Font = new System.Drawing.Font("Trebuchet MS", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.TypeLabel.Location = new System.Drawing.Point(158, 38);
             this.TypeLabel.Name = "TypeLabel";
-            this.TypeLabel.Size = new System.Drawing.Size(86, 18);
+            this.TypeLabel.Size = new System.Drawing.Size(42, 18);
             this.TypeLabel.TabIndex = 4;
-            this.TypeLabel.Text = "Player Type:";
+            this.TypeLabel.Text = "Type:";
             // 
             // IPLabel
             // 
@@ -101,9 +102,10 @@
             this.IPLabel.Font = new System.Drawing.Font("Trebuchet MS", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.IPLabel.Location = new System.Drawing.Point(158, 67);
             this.IPLabel.Name = "IPLabel";
-            this.IPLabel.Size = new System.Drawing.Size(121, 18);
+            this.IPLabel.Size = new System.Drawing.Size(107, 18);
             this.IPLabel.TabIndex = 5;
-            this.IPLabel.Text = "Player IP Address:";
+            this.IPLabel.Text = "IP Address/Port:";
+            this.IPLabel.Visible = false;
             // 
             // TypeBox
             // 
@@ -130,6 +132,7 @@
             this.IPBox.Size = new System.Drawing.Size(100, 20);
             this.IPBox.TabIndex = 7;
             this.IPBox.Text = "127.0.0.1:80";
+            this.IPBox.Visible = false;
             this.IPBox.WordWrap = false;
             // 
             // AINameBox
@@ -173,11 +176,24 @@
             this.AINameBox.TabIndex = 8;
             this.AINameBox.Visible = false;
             // 
+            // IsHost
+            // 
+            this.IsHost.AutoSize = true;
+            this.IsHost.Font = new System.Drawing.Font("Trebuchet MS", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.IsHost.Location = new System.Drawing.Point(10, 34);
+            this.IsHost.Name = "IsHost";
+            this.IsHost.Size = new System.Drawing.Size(74, 22);
+            this.IsHost.TabIndex = 9;
+            this.IsHost.Text = "Is Host?";
+            this.IsHost.UseVisualStyleBackColor = true;
+            this.IsHost.CheckedChanged += new System.EventHandler(this.chkIsHost_CheckedChanged);
+            // 
             // PlayerSetupPanel
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.Controls.Add(this.IsHost);
             this.Controls.Add(this.AINameBox);
             this.Controls.Add(this.IPBox);
             this.Controls.Add(this.TypeBox);
@@ -207,5 +223,6 @@
         private System.Windows.Forms.ComboBox TypeBox;
         private System.Windows.Forms.TextBox IPBox;
         private System.Windows.Forms.ComboBox AINameBox;
+        private System.Windows.Forms.CheckBox IsHost;
     }
 }

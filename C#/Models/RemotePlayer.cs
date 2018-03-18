@@ -8,8 +8,7 @@
 
         #endregion
 
-        public RemotePlayer(string name, string address) :
-            base(name, REMOTE_PLAYER)
+        public RemotePlayer(string name, string playerId, string address) : base(name, REMOTE_PLAYER, playerId)
         {
             this.address = address;
         }
