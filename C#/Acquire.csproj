@@ -52,6 +52,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Forms\RemoteSetupDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\RemoteSetupDialog.Designer.cs">
+      <DependentUpon>RemoteSetupDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="Frames\AboutFrame.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -144,6 +150,10 @@
     <Compile Include="Components\Square.Designer.cs">
       <DependentUpon>Square.cs</DependentUpon>
     </Compile>
+    <Compile Include="Utilities.cs" />
+    <EmbeddedResource Include="Forms\RemoteSetupDialog.resx">
+      <DependentUpon>RemoteSetupDialog.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Frames\AboutFrame.resx">
       <DependentUpon>AboutFrame.cs</DependentUpon>
     </EmbeddedResource>

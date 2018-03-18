@@ -87,14 +87,14 @@ namespace Acquire.Frames
             this.NewGameMenuItem.Name = "NewGameMenuItem";
             this.NewGameMenuItem.Size = new System.Drawing.Size(164, 22);
             this.NewGameMenuItem.Text = "New Game";
-            this.NewGameMenuItem.Click += new System.EventHandler(this.NewGameMenuIteClick);
+            this.NewGameMenuItem.Click += new System.EventHandler(this.NewGameMenuItem_Click);
             // 
             // SaveGameLogMenuItem
             // 
             this.SaveGameLogMenuItem.Name = "SaveGameLogMenuItem";
             this.SaveGameLogMenuItem.Size = new System.Drawing.Size(164, 22);
             this.SaveGameLogMenuItem.Text = "Save Game Log...";
-            this.SaveGameLogMenuItem.Click += new System.EventHandler(this.SaveGameLogMenuIteClick);
+            this.SaveGameLogMenuItem.Click += new System.EventHandler(this.SaveGameLogMenuItem_Click);
             // 
             // toolStripSeparator1
             // 

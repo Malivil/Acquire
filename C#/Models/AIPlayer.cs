@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using Acquire.Components;
 
 namespace Acquire.Models
@@ -11,7 +12,7 @@ namespace Acquire.Models
         /// 
         /// <param name="name">The name to give this AI player</param>
         /// <param name="playerId">The unique id of this player.</param>
-        public AiPlayer(string name, string playerId) : base(name, AI_PLAYER, playerId) { }
+        public AiPlayer(string name, string playerId) : base(name, AI_PLAYER, playerId, false) { }
 
         #region Action Methods
 
@@ -35,12 +36,16 @@ namespace Acquire.Models
             if (Game.OwnerFrame.CanEndGame())
             {
                 Game.EndGame();
+                return;
             }
             // If we can't end the game, but we can end our turn do so
-            else if (Game.OwnerFrame.CanEndTurn())
+            if (Game.OwnerFrame.CanEndTurn())
             {
                 Game.NextTurn();
+                return;
             }
+
+            Trace.Assert(true, $"AI Player ({Name}) is unable to make a move, end the game, or end their turn. This should not be possible");
         }
 
         /// <summary>

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using Acquire.Forms;
@@ -111,7 +110,7 @@ namespace Acquire.Frames
         /// 
         /// <param name="sender">The object sending the event</param>
         /// <param name="args">The arguments sent</param>
-        private void NewGameMenuIteClick(object sender, EventArgs args)
+        private void NewGameMenuItem_Click(object sender, EventArgs args)
         {
             if (MessageBox.Show(@"Are you sure you want to start a new game?", @"Are you sure?", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
             {
@@ -126,34 +125,9 @@ namespace Acquire.Frames
         /// 
         /// <param name="sender">The object sending the event</param>
         /// <param name="args">The arguments sent</param>
-        private void SaveGameLogMenuIteClick(object sender, EventArgs args)
+        private void SaveGameLogMenuItem_Click(object sender, EventArgs args)
         {
-            // Create a new save dialog with the defaults
-            SaveFileDialog saveDialog = new SaveFileDialog
-            {
-                DefaultExt = "txt",
-                Filter = @"Text files (*.txt)|*.txt|All files (*.*)|*.*",
-                FilterIndex = 2,
-                RestoreDirectory = true
-            };
-
-            // Show it until the user closes it, only process if they say "OK"
-            if (saveDialog.ShowDialog() == DialogResult.OK)
-            {
-                // Start a new string
-                string szOutput = string.Empty;
-
-                // Add each line
-                foreach (object oItem in LogBox.Items)
-                {
-                    szOutput += oItem.ToString();
-                }
-
-                // Write it out to the chosen file
-                StreamWriter swWriter = new StreamWriter(saveDialog.FileName);
-                swWriter.Write(szOutput);
-                swWriter.Close();
-            }
+            Utilities.SaveLogFile(LogBox);
         }
 
         /// <summary>
@@ -164,7 +138,7 @@ namespace Acquire.Frames
         /// <param name="args">The arguments sent</param>
         private void HelpToolIteClick(object sender, EventArgs args)
         {
-            new HelpFrame().Show();
+            new HelpFrame().ShowDialog();
         }
 
         /// <summary>
@@ -175,7 +149,7 @@ namespace Acquire.Frames
         /// <param name="args">The arguments sent</param>
         private void AboutMenuIteClick(object sender, EventArgs args)
         {
-            new AboutFrame().Show();
+            new AboutFrame().ShowDialog();
         }
 
         /// <summary>
@@ -197,17 +171,13 @@ namespace Acquire.Frames
         /// <param name="args">The arguments sent</param>
         private void EndTurnButton_Click(object sender, EventArgs args)
         {
-            // Can't end the turn if the button isn't enabled
-            if (!EndTurnButton.Enabled)
-            {
-                return;
-            }
-
             // If they have stocks to buy, make sure they know that
             if (Game.CurrentPlayer.NumBuysLeft > 0 && Game.HasActiveCompanies())
             {
                 if (MessageBox.Show(@"You can still buy shares, do you really want to end your turn?", @"End turn?", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                {
                     Game.NextTurn();
+                }
             }
             else
             {
@@ -223,11 +193,7 @@ namespace Acquire.Frames
         /// <param name="args">The arguments sent</param>
         private void EndGameButton_Click(object sender, EventArgs args)
         {
-            // Can't end if the button isn't enabled
-            if (EndGameButton.Enabled)
-            {
-                Game.EndGame();
-            }
+            Game.EndGame();
         }
 
         /// <summary>

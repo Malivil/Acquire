@@ -49,6 +49,11 @@ namespace Acquire.Models
         public int Type { get; }
 
         /// <summary>
+        /// Whether this player is the host of the game
+        /// </summary>
+        public bool IsHost { get; }
+
+        /// <summary>
         /// The amount of money this player has
         /// </summary>
         public int Money { get; private set; } = 6000;
@@ -75,11 +80,13 @@ namespace Acquire.Models
         /// <param name="name">The name of the player being created.</param>
         /// <param name="type">The type of this player.</param>
         /// <param name="playerId">The unique id of this player.</param>
-        public Player(string name, int type, string playerId)
+        /// <param name="isHost">Whether this player is the host of the game.</param>
+        public Player(string name, int type, string playerId, bool isHost)
         {
             Name = name;
             Type = type;
             PlayerId = playerId;
+            IsHost = isHost;
 
             // Initialize all of the companies
             foreach (Company company in Game.Companies)

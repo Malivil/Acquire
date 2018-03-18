@@ -37,7 +37,7 @@
             this.TypeBox = new System.Windows.Forms.ComboBox();
             this.IPBox = new System.Windows.Forms.TextBox();
             this.AINameBox = new System.Windows.Forms.ComboBox();
-            this.IsHost = new System.Windows.Forms.CheckBox();
+            this.IsHostBox = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // ReadyButton
@@ -176,24 +176,24 @@
             this.AINameBox.TabIndex = 8;
             this.AINameBox.Visible = false;
             // 
-            // IsHost
+            // IsHostBox
             // 
-            this.IsHost.AutoSize = true;
-            this.IsHost.Font = new System.Drawing.Font("Trebuchet MS", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.IsHost.Location = new System.Drawing.Point(10, 34);
-            this.IsHost.Name = "IsHost";
-            this.IsHost.Size = new System.Drawing.Size(74, 22);
-            this.IsHost.TabIndex = 9;
-            this.IsHost.Text = "Is Host?";
-            this.IsHost.UseVisualStyleBackColor = true;
-            this.IsHost.CheckedChanged += new System.EventHandler(this.chkIsHost_CheckedChanged);
+            this.IsHostBox.AutoSize = true;
+            this.IsHostBox.Font = new System.Drawing.Font("Trebuchet MS", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.IsHostBox.Location = new System.Drawing.Point(10, 34);
+            this.IsHostBox.Name = "IsHostBox";
+            this.IsHostBox.Size = new System.Drawing.Size(74, 22);
+            this.IsHostBox.TabIndex = 9;
+            this.IsHostBox.Text = "Is Host?";
+            this.IsHostBox.UseVisualStyleBackColor = true;
+            this.IsHostBox.CheckedChanged += new System.EventHandler(this.chkIsHost_CheckedChanged);
             // 
             // PlayerSetupPanel
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.Controls.Add(this.IsHost);
+            this.Controls.Add(this.IsHostBox);
             this.Controls.Add(this.AINameBox);
             this.Controls.Add(this.IPBox);
             this.Controls.Add(this.TypeBox);
@@ -223,6 +223,6 @@
         private System.Windows.Forms.ComboBox TypeBox;
         private System.Windows.Forms.TextBox IPBox;
         private System.Windows.Forms.ComboBox AINameBox;
-        private System.Windows.Forms.CheckBox IsHost;
+        private System.Windows.Forms.CheckBox IsHostBox;
     }
 }

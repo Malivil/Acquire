@@ -59,8 +59,7 @@ namespace Acquire.Panels
             IPLabel.Enabled = JoinBox.Checked;
             TypeLabel.Enabled = JoinBox.Checked;
 
-            // If this is an AI
-            if (TypeBox.SelectedIndex == Player.AI_PLAYER)
+            if (GetPlayerType() == Player.AI_PLAYER)
             {
                 NameBox.Enabled = false;
                 AINameBox.Enabled = JoinBox.Checked;
@@ -71,6 +70,12 @@ namespace Acquire.Panels
                 NameBox.Enabled = JoinBox.Checked;
                 AINameBox.Enabled = false;
                 AINameBox.Visible = false;
+                IsHostBox.Enabled = JoinBox.Checked;
+
+                if (GetPlayerType() == Player.REMOTE_PLAYER)
+                {
+                    IPBox.Enabled = JoinBox.Checked;
+                }
             }
 
             if (!JoinBox.Checked)
@@ -96,10 +101,10 @@ namespace Acquire.Panels
             IPBox.Enabled = false;
             IPBox.Visible = false;
             IPLabel.Visible = false;
-            IsHost.Enabled = true;
-            IsHost.Visible = true;
+            IsHostBox.Enabled = true;
+            IsHostBox.Visible = true;
 
-            switch (TypeBox.SelectedIndex)
+            switch (GetPlayerType())
             {
                 case Player.LOCAL_PLAYER:
                     NameBox.Enabled = true;
@@ -116,8 +121,8 @@ namespace Acquire.Panels
                     AINameBox.Visible = true;
                     NameBox.Visible = false;
                     NameBox.Enabled = false;
-                    IsHost.Enabled = false;
-                    IsHost.Visible = false;
+                    IsHostBox.Enabled = false;
+                    IsHostBox.Visible = false;
                     break;
             }
         }
@@ -130,21 +135,21 @@ namespace Acquire.Panels
         /// <param name="args">The arguments sent</param>
         private void ReadyButton_Click(object sender, EventArgs args)
         {
-            if (TypeBox.SelectedIndex == Player.LOCAL_PLAYER && string.IsNullOrWhiteSpace(NameBox.Text))
+            if (GetPlayerType() == Player.LOCAL_PLAYER && string.IsNullOrWhiteSpace(NameBox.Text))
             {
                 MessageBox.Show(@"This player doesn't have a name yet.", @"Please enter a name", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 return;
             }
 
-            TypeBox.Enabled = !ReadyButton.Text.Equals(READY);
-            NameLabel.Enabled = !ReadyButton.Text.Equals(READY);
-            IPLabel.Enabled = !ReadyButton.Text.Equals(READY);
-            TypeLabel.Enabled = !ReadyButton.Text.Equals(READY);
+            TypeBox.Enabled = IsReady();
+            NameLabel.Enabled = IsReady();
+            IPLabel.Enabled = IsReady();
+            TypeLabel.Enabled = IsReady();
 
             // If this is an AI
-            if (TypeBox.SelectedIndex == Player.AI_PLAYER)
+            if (GetPlayerType() == Player.AI_PLAYER)
             {
-                AINameBox.Enabled = !ReadyButton.Text.Equals(READY);
+                AINameBox.Enabled = IsReady();
                 AINameBox.Visible = true;
                 NameBox.Enabled = false;
                 IPBox.Enabled = false;
@@ -153,22 +158,23 @@ namespace Acquire.Panels
             {
                 AINameBox.Enabled = false;
                 AINameBox.Visible = false;
+                IsHostBox.Enabled = IsReady();
 
                 // If this is a local user
-                if (TypeBox.SelectedIndex == Player.LOCAL_PLAYER)
+                if (GetPlayerType() == Player.LOCAL_PLAYER)
                 {
-                    NameBox.Enabled = !ReadyButton.Text.Equals(READY);
+                    NameBox.Enabled = IsReady();
                     IPBox.Enabled = false;
                 }
                 // If this is a remote user
                 else
                 {
                     NameBox.Enabled = false;
-                    IPBox.Enabled = !ReadyButton.Text.Equals(READY);
+                    IPBox.Enabled = IsReady();
                 }
             }
 
-            ReadyButton.Text = ReadyButton.Text.Equals(READY) ? UNREADY : READY;
+            ReadyButton.Text = IsReady() ? READY : UNREADY;
         }
 
         /// <summary>
@@ -179,10 +185,10 @@ namespace Acquire.Panels
         /// <param name="args">The arguments sent</param>
         private void chkIsHost_CheckedChanged(object sender, EventArgs args)
         {
-            if (!(PlayerHostStatusChanged?.Invoke(this, IsHost.Checked) ?? true))
+            if (!(PlayerHostStatusChanged?.Invoke(this, IsHostBox.Checked) ?? true))
             {
                 MessageBox.Show(@"There is already a host for this game.", @"Game already has host", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                IsHost.Checked = false;
+                IsHostBox.Checked = false;
             }
         }
 
@@ -200,9 +206,9 @@ namespace Acquire.Panels
         public string GetName()
         {
             // AI Player
-            if (TypeBox.SelectedIndex == Player.AI_PLAYER)
+            if (GetPlayerType() == Player.AI_PLAYER)
             {
-                // Either get the chosen name or a random one if one wasn't chosen
+                // Either get the chosen name or a random one
                 int aiIndex = AINameBox.SelectedIndex > 0 ? AINameBox.SelectedIndex : new Random().Next(1, AINameBox.Items.Count - 1);
                 return AINameBox.Items[aiIndex].ToString();
             }
@@ -212,7 +218,7 @@ namespace Acquire.Panels
             {
                 return NameBox.Text;
             }
-            return TypeBox.SelectedIndex == Player.LOCAL_PLAYER ? "Player" : REMOTE_PLAYER;
+            return GetPlayerType() == Player.LOCAL_PLAYER ? "Player" : REMOTE_PLAYER;
         }
 
         /// <summary>
@@ -228,6 +234,28 @@ namespace Acquire.Panels
         /// 
         /// <returns>The IP address for the player represented by this panel.</returns>
         public string GetAddress() => IPBox.Text;
+
+        /// <summary>
+        /// Gets a new <see cref="Player"/>-derived object for the player represented by this panel
+        /// </summary>
+        ///
+        /// <param name="nameOverride">The name to override this player's name with. Used when creating unique names during setup</param>
+        ///
+        /// <returns>A new <see cref="Player"/>-derived object for the player represented by this panel</returns>
+        public Player GetPlayer(string nameOverride = null)
+        {
+            if (GetPlayerType() == Player.LOCAL_PLAYER)
+            {
+                return new Player(nameOverride ?? GetName(), Player.LOCAL_PLAYER, PlayerId, IsHost());
+            }
+
+            if (GetPlayerType() == Player.AI_PLAYER)
+            {
+                return new AiPlayer(nameOverride ?? GetName(), PlayerId);
+            }
+
+            return new RemotePlayer(PlayerId, GetAddress(), IsHost());
+        }
 
         #endregion
 
@@ -246,6 +274,13 @@ namespace Acquire.Panels
         /// 
         /// <returns>Whether or not the player represented by this panel is ready</returns>
         public bool IsReady() => ReadyButton.Text.Equals(UNREADY);
+
+        /// <summary>
+        /// Returns whether or not the player represented by this panel is the host
+        /// </summary>
+        ///
+        /// <returns>Whether or not the player represented by this panel is the host</returns>
+        public bool IsHost() => IsHostBox.Checked;
 
         #endregion
     }

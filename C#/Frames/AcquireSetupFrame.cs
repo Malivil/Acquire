@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
+using Acquire.Forms;
 using Acquire.Models;
 using Acquire.Panels;
 
@@ -110,27 +111,14 @@ namespace Acquire.Frames
                 playerNames.Add(name);
 
                 // Create the player of the correct type
-                if (panel.GetPlayerType() == Player.LOCAL_PLAYER)
-                {
-                    Players.Add(new Player(name, Player.LOCAL_PLAYER, panel.PlayerId));
-                }
-                else if (panel.GetPlayerType() == Player.REMOTE_PLAYER)
-                {
-                    remotePlayers++;
-                    Players.Add(new RemotePlayer(name, panel.PlayerId, panel.GetAddress()));
-                }
-                else
-                {
-                    aiPlayers++;
-                    Players.Add(new AiPlayer(name, panel.PlayerId));
-                }
+                Players.Add(panel.GetPlayer(name));
             }
 
             // Only continue if we have at least one player
             if (Players.Count > 1)
             {
                 // Make sure the user knows that there are only AI players
-                if (aiPlayers == Players.Count)
+                if (Players.Count(p => p.Type == Player.AI_PLAYER) == Players.Count)
                 {
                     if (MessageBox.Show(@"There are no human players, is this ok?", @"No human players?", MessageBoxButtons.YesNo, MessageBoxIcon.Error) != DialogResult.Yes)
                     {
@@ -139,7 +127,7 @@ namespace Acquire.Frames
                 }
 
                 // Make sure we have a host if we have remote players
-                if (remotePlayers > 0 && !hasHost)
+                if (Players.Any(p => p.Type == Player.REMOTE_PLAYER) && !hasHost)
                 {
                     MessageBox.Show(@"There are remote players listed but no host selected. Please select a host", @"No host selected", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
@@ -176,13 +164,29 @@ namespace Acquire.Frames
                 {
                     args.Cancel = true;
                     IsStarting = false;
+                    return;
+                }
+
+                // Don't launch the remote setup dialog if there are no remote players
+                if (Players.All(p => p.Type != Player.REMOTE_PLAYER))
+                {
+                    return;
+                }
+
+                // Launch the remote setup dialog
+                RemoteSetupDialog remoteDialog = new RemoteSetupDialog(Players);
+                if (remoteDialog.ShowDialog() != DialogResult.OK)
+                {
+                    MessageBox.Show(remoteDialog.GetErrorMessage(), @"Error starting the game", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                    args.Cancel = true;
+                    IsStarting = false;
                 }
             }
             // Otherwise only close it if the user wants to.
             else if (MessageBox.Show(@"Are you sure you want to quit?", @"Are you sure?", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
             {
                 args.Cancel = true;
-                IsStarting = false;
             }
         }
 
