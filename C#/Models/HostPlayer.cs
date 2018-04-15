@@ -3,7 +3,7 @@ using Acquire.Models.Interfaces;
 
 namespace Acquire.Models
 {
-    public class RemotePlayer : Player, IRemotePlayer
+    public class HostPlayer : Player, IHostPlayer
     {
         #region Public Variables
 
@@ -11,7 +11,7 @@ namespace Acquire.Models
 
         #endregion
 
-        public RemotePlayer(string playerId, IPEndPoint address, bool isHost, string name = "Remote Player") : base(name, REMOTE_PLAYER, playerId, isHost)
+        public HostPlayer(string playerId, IPEndPoint address, string name) : base(name, LOCAL_PLAYER, playerId, true)
         {
             Address = address;
         }

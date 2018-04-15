@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using Acquire.Components;
+using Acquire.Models.Interfaces;
 
 namespace Acquire.Models
 {
-    public class Player
+    public class Player : IPlayer
     {
         #region Constants
 

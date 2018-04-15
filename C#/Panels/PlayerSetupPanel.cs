@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Net;
 using System.Windows.Forms;
 using Acquire.Models;
 
@@ -96,12 +97,10 @@ namespace Acquire.Panels
             ReadyButton.Enabled = JoinBox.Checked;
             ReadyButton.Text = READY;
             NameBox.Text = string.Empty;
+            NameBox.Enabled = false;
             NameBox.Visible = true;
-            AINameBox.Enabled = false;
-            AINameBox.Visible = false;
-            IPBox.Enabled = JoinBox.Checked;
-            IPBox.Visible = false;
-            IPLabel.Visible = false;
+            AINameBox.Enabled = AINameBox.Visible = false;
+            IPBox.Visible = IPBox.Enabled = IPLabel.Visible = JoinBox.Checked && IsHostBox.Checked;
             IsHostBox.Enabled = JoinBox.Checked;
             IsHostBox.Visible = true;
 
@@ -111,19 +110,14 @@ namespace Acquire.Panels
                     NameBox.Enabled = JoinBox.Checked;
                     break;
                 case Player.REMOTE_PLAYER:
-                    NameBox.Enabled = false;
-                    IPBox.Enabled = JoinBox.Checked;
-                    IPBox.Visible = true;
-                    IPLabel.Visible = true;
                     NameBox.Text = REMOTE_PLAYER;
                     break;
                 case Player.AI_PLAYER:
                     AINameBox.Enabled = JoinBox.Checked;
                     AINameBox.Visible = true;
                     NameBox.Visible = false;
-                    NameBox.Enabled = false;
-                    IsHostBox.Enabled = false;
-                    IsHostBox.Visible = false;
+                    IsHostBox.Enabled = IsHostBox.Visible = IsHostBox.Checked = false;
+                    IPBox.Visible = IPBox.Enabled = IPLabel.Visible = false;
                     break;
             }
         }
@@ -139,6 +133,12 @@ namespace Acquire.Panels
             if (GetPlayerType() == Player.LOCAL_PLAYER && string.IsNullOrWhiteSpace(NameBox.Text))
             {
                 MessageBox.Show(@"This player doesn't have a name yet.", @"Please enter a name", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                return;
+            }
+
+            if (IsHost() && GetAddressEndPoint() == null)
+            {
+                MessageBox.Show(@"Host player has an invalid IP and/or port entered", @"Please enter a valid IP and port", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 return;
             }
 
@@ -191,6 +191,9 @@ namespace Acquire.Panels
                 MessageBox.Show(@"There is already a host for this game.", @"Game already has host", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 IsHostBox.Checked = false;
             }
+
+            // We only need to enter the IP/Port of the host user
+            IPBox.Visible = IPBox.Enabled = IPLabel.Visible = JoinBox.Checked && IsHostBox.Checked;
         }
 
         #endregion
@@ -236,6 +239,8 @@ namespace Acquire.Panels
         /// <returns>The IP address for the player represented by this panel.</returns>
         public string GetAddress() => IPBox.Text;
 
+        public IPEndPoint GetAddressEndPoint() => Utilities.ParseIPEndPoint(GetAddress());
+
         /// <summary>
         /// Gets a new <see cref="Player"/>-derived object for the player represented by this panel
         /// </summary>
@@ -255,7 +260,7 @@ namespace Acquire.Panels
                 return new AiPlayer(nameOverride ?? GetName(), PlayerId);
             }
 
-            return new RemotePlayer(PlayerId, GetAddress(), IsHost());
+            return new RemotePlayer(PlayerId, GetAddressEndPoint(), IsHost());
         }
 
         #endregion

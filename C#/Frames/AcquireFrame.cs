@@ -5,6 +5,7 @@ using System.Linq;
 using System.Windows.Forms;
 using Acquire.Forms;
 using Acquire.Models;
+using Acquire.Models.Interfaces;
 using Acquire.Panels;
 
 namespace Acquire.Frames
@@ -23,7 +24,7 @@ namespace Acquire.Frames
         /// </summary>
         /// 
         /// <param name="players">Thye list of players for this game</param>
-        public AcquireFrame(List<Player> players)
+        public AcquireFrame(List<IPlayer> players)
         {
             InitializeComponent();
 
@@ -37,25 +38,25 @@ namespace Acquire.Frames
 
             // Initialize the company status buttons
             // Luxor
-            LuxorStatusButton.Company = Game.Companies.First(c => c.GetName() == "Luxor");
+            LuxorStatusButton.Company = Game.Companies.Single(c => c.GetName() == "Luxor");
             LuxorStatusButton.ImageIcon = LuxorStatusButton.Company.ImageIcon;
             // Tower
-            TowerStatusButton.Company = Game.Companies.First(c => c.GetName() == "Tower");
+            TowerStatusButton.Company = Game.Companies.Single(c => c.GetName() == "Tower");
             TowerStatusButton.ImageIcon = TowerStatusButton.Company.ImageIcon;
             // Festival
-            FestivalStatusButton.Company = Game.Companies.First(c => c.GetName() == "Festival");
+            FestivalStatusButton.Company = Game.Companies.Single(c => c.GetName() == "Festival");
             FestivalStatusButton.ImageIcon = FestivalStatusButton.Company.ImageIcon;
             // Worldwide
-            WorldwideStatusButton.Company = Game.Companies.First(c => c.GetName() == "Worldwide");
+            WorldwideStatusButton.Company = Game.Companies.Single(c => c.GetName() == "Worldwide");
             WorldwideStatusButton.ImageIcon = WorldwideStatusButton.Company.ImageIcon;
             // American
-            AmericanStatusButton.Company = Game.Companies.First(c => c.GetName() == "American");
+            AmericanStatusButton.Company = Game.Companies.Single(c => c.GetName() == "American");
             AmericanStatusButton.ImageIcon = AmericanStatusButton.Company.ImageIcon;
             // Continental
-            ContinentalStatusButton.Company = Game.Companies.First(c => c.GetName() == "Continental");
+            ContinentalStatusButton.Company = Game.Companies.Single(c => c.GetName() == "Continental");
             ContinentalStatusButton.ImageIcon = ContinentalStatusButton.Company.ImageIcon;
             // Imperial
-            ImperialStatusButton.Company = Game.Companies.First(c => c.GetName() == "Imperial");
+            ImperialStatusButton.Company = Game.Companies.Single(c => c.GetName() == "Imperial");
             ImperialStatusButton.ImageIcon = ImperialStatusButton.Company.ImageIcon;
 
             // Load up the logo image
@@ -315,7 +316,7 @@ namespace Acquire.Frames
         /// 
         /// <param name="player">The player buying shares</param>
         /// <param name="company">The company to buy shares from</param>
-        private void BuyShare(Player player, Company company)
+        private void BuyShare(IPlayer player, Company company)
         {
             // Can't buy shares if the game is over
             if (!Game.IsGameOver)

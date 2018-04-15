@@ -52,6 +52,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Enums\MessageType.cs" />
+    <Compile Include="Forms\RemoteConnectForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\RemoteConnectForm.Designer.cs">
+      <DependentUpon>RemoteConnectForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Frames\AboutFrame.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -70,6 +77,7 @@
     <Compile Include="Frames\AcquireSetupFrame.Designer.cs">
       <DependentUpon>AcquireSetupFrame.cs</DependentUpon>
     </Compile>
+    <Compile Include="NetworkModels\AcquireNetworkModel.cs" />
     <Compile Include="Models\AIPlayer.cs" />
     <Compile Include="Forms\BuyShareForm.cs">
       <SubType>Form</SubType>
@@ -91,6 +99,12 @@
       <DependentUpon>CompanyStatusButton.cs</DependentUpon>
     </Compile>
     <Compile Include="Models\Game.cs" />
+    <Compile Include="Models\HostPlayer.cs" />
+    <Compile Include="Models\Interfaces\IAIPlayer.cs" />
+    <Compile Include="Models\Interfaces\IHostPlayer.cs" />
+    <Compile Include="Models\Interfaces\IPlayer.cs" />
+    <Compile Include="Models\Interfaces\IRemotePlayer.cs" />
+    <Compile Include="NetworkModels\NetworkMessage.cs" />
     <Compile Include="Panels\GridPanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -145,6 +159,9 @@
       <DependentUpon>Square.cs</DependentUpon>
     </Compile>
     <Compile Include="Utilities.cs" />
+    <EmbeddedResource Include="Forms\RemoteConnectForm.resx">
+      <DependentUpon>RemoteConnectForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Frames\AboutFrame.resx">
       <DependentUpon>AboutFrame.cs</DependentUpon>
     </EmbeddedResource>

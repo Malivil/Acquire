@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.Linq;
 using Acquire.Frames;
+using Acquire.Models.Interfaces;
 using Acquire.Panels;
 
 namespace Acquire.Models
@@ -13,12 +14,12 @@ namespace Acquire.Models
         /// <summary>
         /// The player whose turn it is now
         /// </summary>
-        public static Player CurrentPlayer { get; private set; }
+        public static IPlayer CurrentPlayer { get; private set; }
 
         /// <summary>
         /// The list of all players
         /// </summary>
-        public static List<Player> Players { get; private set; }
+        public static List<IPlayer> Players { get; private set; }
 
         /// <summary>
         /// The active <see cref="AcquireFrame"/>
@@ -54,14 +55,14 @@ namespace Acquire.Models
         /// 
         /// <param name="players">The players playing this Game</param>
         /// <param name="frame">The AcquireFrame used in this Game</param>
-        public static void Initialize(List<Player> players, AcquireFrame frame)
+        public static void Initialize(List<IPlayer> players, AcquireFrame frame)
         {
             // Store the provided variables
             Players = players;
             OwnerFrame = frame;
 
             // Give the players squares
-            foreach (Player pPlayer in Players)
+            foreach (IPlayer pPlayer in Players)
             {
                 OwnerFrame.GetGridPanel().TakeSquare(pPlayer);
             }
@@ -172,7 +173,7 @@ namespace Acquire.Models
         /// </summary>
         public static void EndGame()
         {
-            foreach (Player player in Players)
+            foreach (IPlayer player in Players)
             {
                 foreach (Company company in Companies)
                 {
@@ -184,11 +185,11 @@ namespace Acquire.Models
             }
 
             // Store the first player as both highest and lowest
-            Player highest = Players[0];
-            Player lowest = Players[0];
+            IPlayer highest = Players[0];
+            IPlayer lowest = Players[0];
 
             // Find the lowest and highest money players
-            foreach (Player player in Players)
+            foreach (IPlayer player in Players)
             {
                 if (player.Money > highest.Money)
                 {
@@ -201,7 +202,7 @@ namespace Acquire.Models
             }
 
             // If the amount is the same, there is no winnder
-            Player winner = highest.Money == lowest.Money ? null : highest;
+            IPlayer winner = highest.Money == lowest.Money ? null : highest;
 
             // Let the users know it's all over
             if (winner != null)

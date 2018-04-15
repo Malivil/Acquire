@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 using Acquire.Models;
+using Acquire.Models.Interfaces;
 
 namespace Acquire.Forms
 {
@@ -18,7 +19,7 @@ namespace Acquire.Forms
         private readonly int shares;
 
         // The player that is dealing with shares
-        private readonly Player player;
+        private readonly IPlayer player;
 
         // Whether or not either of the three drop boxes is being changed on purpose
         private bool isTradeChanged = true;
@@ -34,7 +35,7 @@ namespace Acquire.Forms
         /// <param name="liveCompany">The company taking over</param>
         /// <param name="deadCompany">The copany being eaten</param>
         /// <param name="player">The player that is dealing with shares</param>
-        public MergeDialog(Company liveCompany, Company deadCompany, Player player)
+        public MergeDialog(Company liveCompany, Company deadCompany, IPlayer player)
         {
             InitializeComponent();
 

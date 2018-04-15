@@ -190,6 +190,8 @@ namespace Acquire.Frames
             this.Controls.Add(this.PlayerSetupPanel2);
             this.Controls.Add(this.PlayerSetupPanel1);
             this.MaximizeBox = false;
+            this.MaximumSize = new System.Drawing.Size(881, 486);
+            this.MinimumSize = new System.Drawing.Size(881, 486);
             this.Name = "AcquireSetupFrame";
             this.Text = "New Game of Acquire in C#";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.AcquireSetupFrame_FormClosing);

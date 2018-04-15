@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
-using Acquire.Models;
+using Acquire.Models.Interfaces;
 
 namespace Acquire.Panels
 {
@@ -26,7 +26,7 @@ namespace Acquire.Panels
         /// </summary>
         /// 
         /// <param name="players">The list of players to construct status panels for</param>
-        public void SetPlayersList(List<Player> players)
+        public void SetPlayersList(List<IPlayer> players)
         {
             // Clear out what we have saved already
             Controls.Clear();
@@ -42,7 +42,7 @@ namespace Acquire.Panels
                     // Add the border
                     BorderStyle = BorderStyle.FixedSingle
                 };
-                
+
                 // Highlight the current player
                 if (i == 0)
                     panel.BackColor = Color.LightGray;

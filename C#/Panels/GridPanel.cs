@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using Acquire.Components;
 using Acquire.Forms;
 using Acquire.Models;
+using Acquire.Models.Interfaces;
 
 namespace Acquire.Panels
 {
@@ -217,7 +218,7 @@ namespace Acquire.Panels
         /// </summary>
         /// 
         /// <param name="player">The player who is to be given more squares</param>
-        public void TakeSquare(Player player)
+        public void TakeSquare(IPlayer player)
         {
             // Get the squares that the player has already
             List<Square> squares = player.Squares;
@@ -253,7 +254,7 @@ namespace Acquire.Panels
         /// </summary>
         /// 
         /// <param name="player">The player whose placeable squares are going to be displayed</param>
-        public void UpdateHeldSquares(Player player)
+        public void UpdateHeldSquares(IPlayer player)
         {
             // Update the hand panel too
             Game.OwnerFrame.GetHandPanel().SetHand(player.Squares);
@@ -446,7 +447,7 @@ namespace Acquire.Panels
                 foreach (Company company in newlyDead.Where(c => !c.GetName().Equals(newCompany.GetName())))
                 {
                     // Get each player that has shares in this company
-                    foreach (Player player in Game.Players.Where(p => p.GetShares(company) > 0))
+                    foreach (IPlayer player in Game.Players.Where(p => p.GetShares(company) > 0))
                     {
                         // To check if they have any shares in the company
                         // If so, let them decide what to do with them
@@ -508,7 +509,7 @@ namespace Acquire.Panels
             // Redraw the frame
             Game.OwnerFrame.Refresh();
             // Get the current player
-            Player player = Game.CurrentPlayer;
+            IPlayer player = Game.CurrentPlayer;
             // If this company is in the active list, it isn't new
             bool isNew = !ActiveCompanies.Any(c => c.GetName().Equals(newCompany.GetName()));
 

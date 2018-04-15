@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 using Acquire.Models;
+using Acquire.Models.Interfaces;
 
 namespace Acquire.Forms
 {
@@ -9,7 +10,7 @@ namespace Acquire.Forms
         #region Private Member Variables
 
         // The player using this form to buy a share
-        private readonly Player player;
+        private readonly IPlayer player;
 
         // The company from which the player is buying a share
         private readonly Company company;
@@ -22,7 +23,7 @@ namespace Acquire.Forms
         /// 
         /// <param name="player">The player buying a share</param>
         /// <param name="company">The company that shares are being bought of</param>
-        public BuyShareForm(Player player, Company company)
+        public BuyShareForm(IPlayer player, Company company)
         {
             InitializeComponent();
 

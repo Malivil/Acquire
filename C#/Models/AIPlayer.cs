@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 using Acquire.Components;
+using Acquire.Models.Interfaces;
 
 namespace Acquire.Models
 {
-    public class AiPlayer : Player
+    public class AiPlayer : Player, IAIPlayer
     {
         /// <summary>
         /// Creates a new Player with the AI type

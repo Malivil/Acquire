@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 using Acquire.Models;
+using Acquire.Models.Interfaces;
 
 namespace Acquire.Panels
 {
@@ -9,7 +10,7 @@ namespace Acquire.Panels
         #region Private Member Variables
 
         // The player associated with this panel
-        private readonly Player player;
+        private readonly IPlayer player;
 
         #endregion
 
@@ -18,7 +19,7 @@ namespace Acquire.Panels
         /// </summary>
         /// 
         /// <param name="player">The player to associate with this panel</param>
-        public PlayerStatusPanel(Player player)
+        public PlayerStatusPanel(IPlayer player)
         {
             InitializeComponent();
 
