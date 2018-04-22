@@ -1,21 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using Acquire.Components;
+using Acquire.Enums;
 using Acquire.Models.Interfaces;
 
 namespace Acquire.Models
 {
     public class Player : IPlayer
     {
-        #region Constants
-
-        // A static variable representing the type of this player
-        public const int LOCAL_PLAYER = 0;
-        public const int REMOTE_PLAYER = 1;
-        public const int AI_PLAYER = 2;
-
-        #endregion
-
         #region Private Member Variables
 
         // Whether this player can place a square or not
@@ -47,7 +39,7 @@ namespace Acquire.Models
         /// <summary>
         /// The type of player this is
         /// </summary>
-        public int Type { get; }
+        public PlayerType Type { get; }
 
         /// <summary>
         /// Whether this player is the host of the game
@@ -82,7 +74,7 @@ namespace Acquire.Models
         /// <param name="type">The type of this player.</param>
         /// <param name="playerId">The unique id of this player.</param>
         /// <param name="isHost">Whether this player is the host of the game.</param>
-        public Player(string name, int type, string playerId, bool isHost)
+        public Player(string name, PlayerType type, string playerId, bool isHost)
         {
             Name = name;
             Type = type;

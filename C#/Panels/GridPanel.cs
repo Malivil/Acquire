@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using Acquire.Components;
+using Acquire.Enums;
 using Acquire.Forms;
 using Acquire.Models;
 using Acquire.Models.Interfaces;
@@ -419,7 +420,7 @@ namespace Acquire.Panels
                 newCompany = options[0];
             }
             // If the player is an AI, let them choose a company without the GUI
-            else if (Game.CurrentPlayer.Type == Player.AI_PLAYER)
+            else if (Game.CurrentPlayer.Type == PlayerType.AI)
             {
                 newCompany = ((AiPlayer)Game.CurrentPlayer).ChooseCompany(options);
             }
@@ -451,7 +452,7 @@ namespace Acquire.Panels
                     {
                         // To check if they have any shares in the company
                         // If so, let them decide what to do with them
-                        if (player.Type != Player.AI_PLAYER)
+                        if (player.Type != PlayerType.AI)
                         {
                             new MergeDialog(newCompany, company, player).ShowDialog();
                         }

@@ -37,11 +37,11 @@ namespace Acquire.Frames
         // Whether this game already has a host
         private bool HasHost => hostPlayer?.IsHost() ?? false;
 
+        // Whether the host player is a local player or not
+        private bool IsHostLocal => hostPlayer?.GetPlayerType() == PlayerType.Local;
+
         // Who the host player is
         private PlayerSetupPanel hostPlayer;
-
-        // Whether the host player is a local player or not
-        private bool isHostLocal => hostPlayer?.GetPlayerType() == Player.LOCAL_PLAYER;
 
         // The original size of this frame
         private readonly Size originalSize;
@@ -93,7 +93,7 @@ namespace Acquire.Frames
                 if (!panel.IsReady())
                 {
                     // Tell the user who isn't ready
-                    if (panel.GetPlayerType() != Player.AI_PLAYER)
+                    if (panel.GetPlayerType() != PlayerType.AI)
                     {
                         MessageBox.Show($@"{panel.GetName()} is not ready yet.", @"Player not ready", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
@@ -101,6 +101,7 @@ namespace Acquire.Frames
                     {
                         MessageBox.Show(@"AI Player is not set to ready yet.", @"AI not set to ready", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
+
                     return;
                 }
 
@@ -134,7 +135,7 @@ namespace Acquire.Frames
             if (Players.Count > 1)
             {
                 // Make sure the user knows that there are only AI players
-                if (Players.Count(p => p.Type == Player.AI_PLAYER) == Players.Count)
+                if (Players.Count(p => p.Type == PlayerType.AI) == Players.Count)
                 {
                     if (MessageBox.Show(@"There are no human players, is this ok?", @"No human players?", MessageBoxButtons.YesNo, MessageBoxIcon.Error) != DialogResult.Yes)
                     {
@@ -143,14 +144,14 @@ namespace Acquire.Frames
                 }
 
                 // Make sure we have a host if we have remote players
-                if (Players.Any(p => p.Type == Player.REMOTE_PLAYER) && !HasHost)
+                if (Players.Any(p => p.Type == PlayerType.Remote) && !HasHost)
                 {
                     MessageBox.Show(@"There are remote players listed but no host selected. Please select a host", @"No host selected", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
 
                 // If there is a remote host, initiate the connection
-                if (Players.SingleOrDefault(p => p.Type == Player.REMOTE_PLAYER && p.IsHost) is IRemotePlayer remoteHost)
+                if (Players.SingleOrDefault(p => p.Type == PlayerType.Remote && p.IsHost) is IRemotePlayer remoteHost)
                 {
                     DialogResult result = new RemoteConnectForm(remoteHost.Address).ShowDialog();
                     // Don't start the game if the prcoess didn't complete successfully
@@ -225,7 +226,7 @@ namespace Acquire.Frames
             }
 
             // If this isn't a local host and we have an open server, close it
-            if (!isHostLocal && CloseServerButton.Enabled)
+            if (!IsHostLocal && CloseServerButton.Enabled)
             {
                 CloseServerButton.PerformClick();
                 OpenServerButton.Visible = false;
@@ -249,34 +250,85 @@ namespace Acquire.Frames
 
             // Begin listening
             IPEndPoint endpoint = hostPlayer.GetAddressEndPoint();
-            hostServer = new TcpServer();
-            hostServer.Connected += Server_Connected;
-            hostServer.Start(endpoint.Port);
-            RemoteStatusBox.Items.Add($"Listening for new connections on {endpoint.Address}:{endpoint.Port}");
+
+            try
+            {
+                hostServer = new TcpServer();
+                hostServer.Connected += Server_Connected;
+                hostServer.Start(endpoint.Port);
+                AddRemoteStatusMessage($"Listening for new connections on {endpoint.Address}:{endpoint.Port}");
+            }
+            catch (Exception ex)
+            {
+                AddRemoteStatusMessage($"Error when trying to open server connection: {ex.Message}");
+            }
         }
 
         private void Server_Connected(object sender, ConnectionEventArgs e)
         {
-            // TODO: Set up events for receiving messages from client
-            NetworkMessage connectMessage = new NetworkMessage(new AcquireNetworkModel(), hostPlayer.GetAddressEndPoint(), MessageType.Connect);
-            e.Connection.SetMode(MessageMode.DelimiterBound);
-            string message = JsonConvert.SerializeObject(connectMessage);
-            e.Connection.SetDelimiter('|');
-            e.Connection.Send(message + "|");
-
-            // TODO: Figure out why the client isn't receiving this message
-
-            Utilities.InvokeOnControl(RemoteStatusBox, () =>
+            // Update the UI
+            if (e.Connection.Socket.RemoteEndPoint is IPEndPoint endpoint)
             {
-                if (e.Connection.Socket.RemoteEndPoint is IPEndPoint endpoint)
-                {
-                    RemoteStatusBox.Items.Add($"Received new connection from {endpoint.Address}:{endpoint.Port}");
-                }
-                else
-                {
-                    RemoteStatusBox.Items.Add("Received new connection");
-                }
-            });
+                AddRemoteStatusMessage($"Received new connection from {endpoint.Address}:{endpoint.Port}");
+            }
+            else
+            {
+                AddRemoteStatusMessage("Received new connection");
+            }
+
+            NetworkMessage connectMessage = new NetworkMessage(new AcquireNetworkModel(), hostPlayer.GetAddressEndPoint(), MessageType.Connect);
+            // Set up events for receiving messages and disconnects from client
+            e.Connection.ReceivedMessage += Connection_ReceivedMessage;
+            e.Connection.Disconnected += Connection_Disconnected;
+            // TODO: Remove these when moving on to the actual game
+
+            // Set up the connection to use our expected format
+            e.Connection.SetDelimiter('|');
+            e.Connection.SetMode(MessageMode.PrefixedLength);
+
+            // Send the connection response message
+            string message = JsonConvert.SerializeObject(connectMessage);
+            Utilities.SendMessageToConnection(e.Connection, message);
+        }
+
+        private void Connection_ReceivedMessage(object sender, EventArgs e)
+        {
+            Connection connection = sender as Connection;
+            NetworkMessage message = Utilities.GetMessageFromConnection<NetworkMessage>(connection);
+            switch (message.MessageType)
+            {
+                case MessageType.PlayerListResponse:
+                    // TODO: Ask for players list to trigger this
+                    // TODO: Do something with the players list
+                    // TODO: Negotiate player names
+                    // TODO: Negotiate player limits
+                    break;
+                default:
+                    RemoteStatusBox.Items.Add($"ERROR: Received unknown message type! `{message.MessageType}`");
+                    break;
+            }
+        }
+
+        // TODO: Use this to send the players list from the connecting remote and also when the Start sequence begins
+        //case MessageType.PlayerListRequest:
+        //PlayerList players = new PlayerList
+        //{
+        //    Players = GetAdjustedPlayersList()
+        //};
+        //Utilities.SendMessageToConnection(connection, Utilities.GetNetworkMessageString(players, hostPlayer.GetAddressEndPoint(), MessageType.PlayerListResponse));
+        //break;
+
+        private void Connection_Disconnected(object sender, EventArgs e)
+        {
+            Connection connection = (Connection)sender;
+            if (connection.Socket.RemoteEndPoint is IPEndPoint endpoint)
+            {
+                AddRemoteStatusMessage($"Lost connection from {endpoint.Address}:{endpoint.Port}");
+            }
+            else
+            {
+                AddRemoteStatusMessage("Lost connection");
+            }
         }
 
         private void CloseServerButton_Click(object sender, EventArgs e)
@@ -290,15 +342,38 @@ namespace Acquire.Frames
             // Stop listening
             if (hostServer != null)
             {
-                if (hostServer.IsStarted)
-                {
-                    hostServer.Connected -= Server_Connected;
-                }
-
+                hostServer.Connected -= Server_Connected;
                 RemoteStatusBox.Items.Add("Stopped listening for new connections");
             }
         }
 
         #endregion
+
+        #region Helpers
+
+        private void AddRemoteStatusMessage(string message)
+        {
+            Utilities.InvokeOnControl(RemoteStatusBox, () => RemoteStatusBox.Items.Add(message));
+        }
+
+        private List<Player> GetAdjustedPlayersList()
+        {
+            List<Player> players = new List<Player>();
+            foreach (IPlayer player in Players)
+            {
+                // Change local players to remote players so each connecting game knows how to handle things correctly
+                if (player.Type == PlayerType.Local)
+                {
+                    players.Add(new RemotePlayer(player.PlayerId, hostPlayer.GetAddressEndPoint(), player.IsHost, player.Name));
+                }
+
+                // TODO: Exclude the players from the asking client if they are in this list already?
+
+                players.Add((Player)player);
+            }
+            return players;
+        }
+
+    #endregion
     }
 }

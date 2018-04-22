@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 using Acquire.Components;
+using Acquire.Enums;
 using Acquire.Models.Interfaces;
 
 namespace Acquire.Models
@@ -13,7 +14,7 @@ namespace Acquire.Models
         /// 
         /// <param name="name">The name to give this AI player</param>
         /// <param name="playerId">The unique id of this player.</param>
-        public AiPlayer(string name, string playerId) : base(name, AI_PLAYER, playerId, false) { }
+        public AiPlayer(string name, string playerId) : base(name, PlayerType.AI, playerId, false) { }
 
         #region Action Methods
 

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Acquire.Components;
+using Acquire.Enums;
 
 namespace Acquire.Models.Interfaces
 {
@@ -20,7 +21,7 @@ namespace Acquire.Models.Interfaces
         /// <summary>
         /// The type of player this is
         /// </summary>
-        int Type { get; }
+        PlayerType Type { get; }
 
         /// <summary>
         /// Whether this player is the host of the game

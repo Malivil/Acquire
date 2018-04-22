@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using Acquire.Enums;
 using Acquire.Models.Interfaces;
 
 namespace Acquire.Models
@@ -11,7 +12,7 @@ namespace Acquire.Models
 
         #endregion
 
-        public HostPlayer(string playerId, IPEndPoint address, string name) : base(name, LOCAL_PLAYER, playerId, true)
+        public HostPlayer(string playerId, IPEndPoint address, string name) : base(name, PlayerType.Local, playerId, true)
         {
             Address = address;
         }

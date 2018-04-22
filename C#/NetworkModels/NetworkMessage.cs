@@ -7,11 +7,13 @@ namespace Acquire.NetworkModels
     {
         #region Public Variables
 
-        public string SourceAddress { get; }
-        public MessageType MessageType { get; }
-        public AcquireNetworkModel Data { get; }
+        public string SourceAddress { get; set; }
+        public MessageType MessageType { get; set; }
+        public AcquireNetworkModel Data { get; set; }
 
         #endregion
+
+        public NetworkMessage() { }
 
         public NetworkMessage(AcquireNetworkModel data, IPEndPoint endpoint, MessageType type)
         {

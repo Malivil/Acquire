@@ -3,6 +3,10 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Windows.Forms;
+using Acquire.Enums;
+using Acquire.NetworkModels;
+using Newtonsoft.Json;
+using SocketMessaging;
 
 namespace Acquire
 {
@@ -59,6 +63,34 @@ namespace Acquire
             }
 
             return null;
+        }
+
+        public static T GetMessageFromConnection<T>(Connection connection)
+            => JsonConvert.DeserializeObject<T>(GetMessageFromConnection(connection));
+
+        public static string GetMessageFromConnection(Connection connection)
+        {
+            string message = connection.ReceiveMessageString();
+            if (connection.Mode != MessageMode.PrefixedLength)
+            {
+                return message;
+            }
+
+            // Since we are using PrefixedLength, remove the length from the beginning of the string
+            return connection.MessageEncoding.GetString(connection.MessageEncoding.GetBytes(message).Skip(4).ToArray());
+        }
+
+        public static string GetNetworkMessageString(AcquireNetworkModel model, IPEndPoint endpoint, MessageType type)
+            => JsonConvert.SerializeObject(new NetworkMessage(model, endpoint, type));
+
+        public static void SendMessageToConnection(Connection connection, string message)
+        {
+            if (connection.Mode != MessageMode.PrefixedLength)
+            {
+                throw new NotSupportedException("Only PrefixedLength is currently supported");
+            }
+
+            connection.Send($"{message.Length:0000}{message}");
         }
 
         #endregion

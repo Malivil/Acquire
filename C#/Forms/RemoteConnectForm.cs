@@ -12,19 +12,30 @@ namespace Acquire.Forms
     public partial class RemoteConnectForm : Form
     {
         private TcpClient client;
+        private readonly IPEndPoint endpoint;
 
         public RemoteConnectForm(IPEndPoint endpoint)
         {
+            this.endpoint = endpoint;
+
             InitializeComponent();
-            InitiateConnection(endpoint);
+            InitiateConnection();
         }
 
-        private void InitiateConnection(IPEndPoint endpoint)
+        private void InitiateConnection()
         {
-            RemoteStatusBox.Items.Add($"Connecting to {endpoint.Address}:{endpoint.Port}...");
-            client = TcpClient.Connect(endpoint.Address, endpoint.Port);
-            client.SetDelimiter('|');
-            client.ReceivedMessage += Client_ReceivedMessage;
+            AddRemoteStatusMessage($"Connecting to {endpoint.Address}:{endpoint.Port}...");
+            try
+            {
+                client = TcpClient.Connect(endpoint.Address, endpoint.Port);
+                client.ReceivedMessage += Client_ReceivedMessage;
+                client.Disconnected += Client_Disconnected;
+                client.SetMode(MessageMode.PrefixedLength);
+            }
+            catch (Exception ex)
+            {
+                AddRemoteStatusMessage($"ERROR: Connection to host failed: {ex.Message}");
+            }
         }
 
         public TcpClient GetClient()
@@ -41,28 +52,58 @@ namespace Acquire.Forms
 
         private void Client_ReceivedMessage(object sender, EventArgs e)
         {
-            string result = client.ReceiveMessageString();
-            NetworkMessage message = JsonConvert.DeserializeObject<NetworkMessage>(result);
+            NetworkMessage message = Utilities.GetMessageFromConnection<NetworkMessage>(client);
             switch (message.MessageType) {
                 case MessageType.Connect:
-                    RemoteStatusBox.Items.Add("Connected! Requesting player list...");
-                    // TODO: Request player list
+                    // Just sit waiting until the server sends us data
+                    AddRemoteStatusMessage("Connected!");
                     break;
                 case MessageType.PlayerListResponse:
-                    RemoteStatusBox.Items.Add("Received list of players");
+                    AddRemoteStatusMessage("Received list of players");
+                    PlayerList players = message.Data as PlayerList;
                     // TODO: Do something with the player list
-                    // TODO: Start the game?
+                    // Start the game
+                    StartGame();
                     break;
                 default:
-                    RemoteStatusBox.Items.Add($"ERROR: Received unknown message type! `{message.MessageType}`");
+                    AddRemoteStatusMessage($"ERROR: Received unknown message type! `{message.MessageType}`");
                     break;
             }
+        }
 
+        private void Client_Disconnected(object sender, EventArgs e)
+        {
+            AddRemoteStatusMessage($"Lost connection from {endpoint.Address}:{endpoint.Port}");
         }
 
         private void CancelConnectButton_Click(object sender, EventArgs e)
         {
-            client.Close();
+            client?.Close();
+        }
+
+        #endregion
+
+        #region Helpers
+
+        private void StartGame()
+        {
+            AddRemoteStatusMessage("Starting game...");
+            // Stop listening for messages with this handler
+            // The client will be passed on to handle the game messages
+            client.ReceivedMessage -= Client_ReceivedMessage;
+            client.Disconnected -= Client_Disconnected;
+            DialogResult = DialogResult.OK;
+        }
+
+        private void SendMessage(MessageType type)
+        {
+            NetworkMessage message = new NetworkMessage(null, endpoint, type);
+            Utilities.SendMessageToConnection(client, JsonConvert.SerializeObject(message));
+        }
+
+        private void AddRemoteStatusMessage(string message)
+        {
+            Utilities.InvokeOnControl(RemoteStatusBox, () => RemoteStatusBox.Items.Add(message));
         }
 
         #endregion

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using Acquire.Enums;
 using Acquire.Frames;
 using Acquire.Models.Interfaces;
 using Acquire.Panels;
@@ -77,7 +78,7 @@ namespace Acquire.Models
             LogMaster.Log("It is " + CurrentPlayer.Name + "'s turn first.");
 
             // If this is an AI player, get them started
-            if (CurrentPlayer.Type == Player.AI_PLAYER)
+            if (CurrentPlayer.Type == PlayerType.AI)
             {
                 ((AiPlayer)CurrentPlayer).TakeTurn();
             }
@@ -149,7 +150,7 @@ namespace Acquire.Models
                     for (int i = 0; i < Players.Count && canEnd; i++)
                     {
                         // Don't wait for AI players to place all their squares... 'cause they are dumb
-                        if (Players[i].Type != Player.AI_PLAYER && Players[i].Squares.Count > 0)
+                        if (Players[i].Type != PlayerType.AI && Players[i].Squares.Count > 0)
                         {
                             canEnd = false;
                         }
@@ -254,7 +255,7 @@ namespace Acquire.Models
             LogMaster.Log("It is now " + CurrentPlayer.Name + "'s turn.");
 
             // If this is an AI player, make them take their turn
-            if (CurrentPlayer.Type == Player.AI_PLAYER)
+            if (CurrentPlayer.Type == PlayerType.AI)
             {
                 ((AiPlayer)CurrentPlayer).TakeTurn();
             }

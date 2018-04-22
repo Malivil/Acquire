@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Net;
 using System.Windows.Forms;
+using Acquire.Enums;
 using Acquire.Models;
 
 namespace Acquire.Panels
@@ -41,7 +42,7 @@ namespace Acquire.Panels
             InitializeComponent();
 
             AINameBox.SelectedIndex = 0;
-            TypeBox.SelectedIndex = Player.LOCAL_PLAYER;
+            TypeBox.SelectedIndex = (int)PlayerType.Local;
         }
 
         #region Event Handlers
@@ -60,7 +61,7 @@ namespace Acquire.Panels
             IPLabel.Enabled = JoinBox.Checked;
             TypeLabel.Enabled = JoinBox.Checked;
 
-            if (GetPlayerType() == Player.AI_PLAYER)
+            if (GetPlayerType() == PlayerType.AI)
             {
                 NameBox.Enabled = false;
                 AINameBox.Enabled = JoinBox.Checked;
@@ -73,7 +74,7 @@ namespace Acquire.Panels
                 AINameBox.Visible = false;
                 IsHostBox.Enabled = JoinBox.Checked;
 
-                if (GetPlayerType() == Player.REMOTE_PLAYER)
+                if (GetPlayerType() == PlayerType.Remote)
                 {
                     IPBox.Enabled = JoinBox.Checked;
                 }
@@ -106,19 +107,27 @@ namespace Acquire.Panels
 
             switch (GetPlayerType())
             {
-                case Player.LOCAL_PLAYER:
+                case PlayerType.Local:
                     NameBox.Enabled = JoinBox.Checked;
                     break;
-                case Player.REMOTE_PLAYER:
+                case PlayerType.Remote:
                     NameBox.Text = REMOTE_PLAYER;
                     break;
-                case Player.AI_PLAYER:
+                case PlayerType.AI:
                     AINameBox.Enabled = JoinBox.Checked;
                     AINameBox.Visible = true;
                     NameBox.Visible = false;
                     IsHostBox.Enabled = IsHostBox.Visible = IsHostBox.Checked = false;
                     IPBox.Visible = IPBox.Enabled = IPLabel.Visible = false;
                     break;
+            }
+
+            // Toggle the check mark to refresh the state of the host player in the setup frame
+            // This fixes switching between Local and Remote not updating the status of things like the "Begin Listening" button
+            if (IsHostBox.Checked)
+            {
+                IsHostBox.Checked = false;
+                IsHostBox.Checked = true;
             }
         }
 
@@ -130,7 +139,7 @@ namespace Acquire.Panels
         /// <param name="args">The arguments sent</param>
         private void ReadyButton_Click(object sender, EventArgs args)
         {
-            if (GetPlayerType() == Player.LOCAL_PLAYER && string.IsNullOrWhiteSpace(NameBox.Text))
+            if (GetPlayerType() == PlayerType.Local && string.IsNullOrWhiteSpace(NameBox.Text))
             {
                 MessageBox.Show(@"This player doesn't have a name yet.", @"Please enter a name", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 return;
@@ -148,7 +157,7 @@ namespace Acquire.Panels
             TypeLabel.Enabled = IsReady();
 
             // If this is an AI
-            if (GetPlayerType() == Player.AI_PLAYER)
+            if (GetPlayerType() == PlayerType.AI)
             {
                 AINameBox.Enabled = IsReady();
                 AINameBox.Visible = true;
@@ -162,7 +171,7 @@ namespace Acquire.Panels
                 IsHostBox.Enabled = IsReady();
 
                 // If this is a local user
-                if (GetPlayerType() == Player.LOCAL_PLAYER)
+                if (GetPlayerType() == PlayerType.Local)
                 {
                     NameBox.Enabled = IsReady();
                     IPBox.Enabled = false;
@@ -210,7 +219,7 @@ namespace Acquire.Panels
         public string GetName()
         {
             // AI Player
-            if (GetPlayerType() == Player.AI_PLAYER)
+            if (GetPlayerType() == PlayerType.AI)
             {
                 // Either get the chosen name or a random one
                 int aiIndex = AINameBox.SelectedIndex > 0 ? AINameBox.SelectedIndex : new Random().Next(1, AINameBox.Items.Count - 1);
@@ -222,7 +231,7 @@ namespace Acquire.Panels
             {
                 return NameBox.Text;
             }
-            return GetPlayerType() == Player.LOCAL_PLAYER ? "Player" : REMOTE_PLAYER;
+            return GetPlayerType() == PlayerType.Local ? "Player" : REMOTE_PLAYER;
         }
 
         /// <summary>
@@ -230,7 +239,7 @@ namespace Acquire.Panels
         /// </summary>
         /// 
         /// <returns>The type of the player represented by this panel</returns>
-        public int GetPlayerType() => TypeBox.SelectedIndex;
+        public PlayerType GetPlayerType() => (PlayerType)TypeBox.SelectedIndex;
 
         /// <summary>
         /// Returns the IP address for the player represented by this panel.
@@ -250,12 +259,12 @@ namespace Acquire.Panels
         /// <returns>A new <see cref="Player"/>-derived object for the player represented by this panel</returns>
         public Player GetPlayer(string nameOverride = null)
         {
-            if (GetPlayerType() == Player.LOCAL_PLAYER)
+            if (GetPlayerType() == PlayerType.Local)
             {
-                return new Player(nameOverride ?? GetName(), Player.LOCAL_PLAYER, PlayerId, IsHost());
+                return new Player(nameOverride ?? GetName(), PlayerType.Local, PlayerId, IsHost());
             }
 
-            if (GetPlayerType() == Player.AI_PLAYER)
+            if (GetPlayerType() == PlayerType.AI)
             {
                 return new AiPlayer(nameOverride ?? GetName(), PlayerId);
             }
