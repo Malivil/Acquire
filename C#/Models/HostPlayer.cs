@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using Acquire.Enums;
 using Acquire.Models.Interfaces;
+using Newtonsoft.Json;
 
 namespace Acquire.Models
 {
@@ -8,11 +9,13 @@ namespace Acquire.Models
     {
         #region Public Variables
 
-        public IPEndPoint Address { get; }
+        [JsonIgnore]
+        public IPEndPoint Endpoint => Utilities.ParseIPEndPoint(Address);
+        public string Address { get; }
 
         #endregion
 
-        public HostPlayer(string playerId, IPEndPoint address, string name) : base(name, PlayerType.Local, playerId, true)
+        public HostPlayer(string playerId, string address, string name) : base(name, PlayerType.Local, playerId, true)
         {
             Address = address;
         }

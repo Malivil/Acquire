@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Net;
@@ -10,7 +11,6 @@ using Acquire.Models;
 using Acquire.Models.Interfaces;
 using Acquire.NetworkModels;
 using Acquire.Panels;
-using Newtonsoft.Json;
 using SocketMessaging;
 using SocketMessaging.Server;
 
@@ -52,6 +52,9 @@ namespace Acquire.Frames
         // The server we are hosting for this game
         private TcpServer hostServer;
 
+        // The mapping of endpoint string to list of players from remote connection
+        private readonly Dictionary<string, List<Player>> remotePlayers = new Dictionary<string, List<Player>>();
+
         #endregion
 
         /// <summary>
@@ -73,69 +76,18 @@ namespace Acquire.Frames
         /// <param name="args">The arguments sent</param>
         private void StartButton_Click(object sender, EventArgs args)
         {
-            // Create a list of the PSPs to make it easier and quicker to run the same code on each
-            IEnumerable<PlayerSetupPanel> setupPanels = Controls.OfType<PlayerSetupPanel>();
-            // Clear the current list of players
-            Players.Clear();
-            // The list of current player names (to eliminate duplicates)
-            List<string> playerNames = new List<string>();
-
-            // For each panel...
-            foreach (PlayerSetupPanel panel in setupPanels)
+            if (!LoadPlayersList())
             {
-                // If we are not joining, continue
-                if (!panel.IsJoining())
-                {
-                    continue;
-                }
-
-                // Check if the player is ready
-                if (!panel.IsReady())
-                {
-                    // Tell the user who isn't ready
-                    if (panel.GetPlayerType() != PlayerType.AI)
-                    {
-                        MessageBox.Show($@"{panel.GetName()} is not ready yet.", @"Player not ready", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    }
-                    else
-                    {
-                        MessageBox.Show(@"AI Player is not set to ready yet.", @"AI not set to ready", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    }
-
-                    return;
-                }
-
-                // TODO: Figure out how to handle this for remote players. Maybe have it as part of the handshake and force a remote player to append a number then?
-
-                // Get the current name
-                string name = panel.GetName();
-
-                // Make sure there are no duplicates
-                if (playerNames.Contains(name))
-                {
-                    // Find a number to add to the end to make it unique
-                    for (int i = 2; i <= 9; i++)
-                    {
-                        if (!playerNames.Contains($"{name} ({i})"))
-                        {
-                            name += $" ({i})";
-                            break;
-                        }
-                    }
-                }
-
-                // Add this name to the list of names used
-                playerNames.Add(name);
-
-                // Create the player of the correct type
-                Players.Add(panel.GetPlayer(name));
+                return;
             }
 
+            List<IPlayer> players = GetPlayers();
+
             // Only continue if we have at least one player
-            if (Players.Count > 1)
+            if (players.Count > 1)
             {
                 // Make sure the user knows that there are only AI players
-                if (Players.Count(p => p.Type == PlayerType.AI) == Players.Count)
+                if (players.Count(p => p.Type == PlayerType.AI) == players.Count)
                 {
                     if (MessageBox.Show(@"There are no human players, is this ok?", @"No human players?", MessageBoxButtons.YesNo, MessageBoxIcon.Error) != DialogResult.Yes)
                     {
@@ -144,16 +96,16 @@ namespace Acquire.Frames
                 }
 
                 // Make sure we have a host if we have remote players
-                if (Players.Any(p => p.Type == PlayerType.Remote) && !HasHost)
+                if (players.Any(p => p.Type == PlayerType.Remote) && !HasHost)
                 {
                     MessageBox.Show(@"There are remote players listed but no host selected. Please select a host", @"No host selected", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
 
                 // If there is a remote host, initiate the connection
-                if (Players.SingleOrDefault(p => p.Type == PlayerType.Remote && p.IsHost) is IRemotePlayer remoteHost)
+                if (players.SingleOrDefault(p => p.Type == PlayerType.Remote && p.IsHost) is IRemotePlayer remoteHost)
                 {
-                    DialogResult result = new RemoteConnectForm(remoteHost.Address).ShowDialog();
+                    DialogResult result = new RemoteConnectForm(remoteHost.Endpoint, players).ShowDialog();
                     // Don't start the game if the prcoess didn't complete successfully
                     if (result != DialogResult.OK)
                     {
@@ -241,8 +193,19 @@ namespace Acquire.Frames
             return true;
         }
 
+        /// <summary>
+        /// TODO: Comment
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OpenServerButton_Click(object sender, EventArgs e)
         {
+            // Make sure we have a list of players to broadcast
+            if (!LoadPlayersList())
+            {
+                return;
+            }
+
             MaximumSize = new Size(Size.Width + remoteStatusWidth, Size.Height);
             Size = MaximumSize;
             MinimumSize = MaximumSize;
@@ -264,6 +227,11 @@ namespace Acquire.Frames
             }
         }
 
+        /// <summary>
+        /// TODO: Comment
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Server_Connected(object sender, ConnectionEventArgs e)
         {
             // Update the UI
@@ -273,10 +241,11 @@ namespace Acquire.Frames
             }
             else
             {
-                AddRemoteStatusMessage("Received new connection");
+                AddRemoteStatusMessage("Received new connection from unsupported endpoint, disconnecting");
+                e.Connection.Close();
+                return;
             }
 
-            NetworkMessage connectMessage = new NetworkMessage(new AcquireNetworkModel(), hostPlayer.GetAddressEndPoint(), MessageType.Connect);
             // Set up events for receiving messages and disconnects from client
             e.Connection.ReceivedMessage += Connection_ReceivedMessage;
             e.Connection.Disconnected += Connection_Disconnected;
@@ -287,21 +256,38 @@ namespace Acquire.Frames
             e.Connection.SetMode(MessageMode.PrefixedLength);
 
             // Send the connection response message
-            string message = JsonConvert.SerializeObject(connectMessage);
-            Utilities.SendMessageToConnection(e.Connection, message);
+            SendMessage(e.Connection, MessageType.Connect);
         }
 
+        /// <summary>
+        /// TODO: Comment
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Connection_ReceivedMessage(object sender, EventArgs e)
         {
             Connection connection = sender as Connection;
+            Debug.Assert(connection != null);
+
             NetworkMessage message = Utilities.GetMessageFromConnection<NetworkMessage>(connection);
             switch (message.MessageType)
             {
                 case MessageType.PlayerListResponse:
-                    // TODO: Ask for players list to trigger this
-                    // TODO: Do something with the players list
+                    // Save the players list
+                    remotePlayers[GetEndPointId(connection.Socket.RemoteEndPoint as IPEndPoint)] = (message.Data as PlayerList)?.Players;
+
                     // TODO: Negotiate player names
                     // TODO: Negotiate player limits
+
+                    // Broadcast full players list to every connected client
+                    foreach (Connection clientConnection in hostServer.Connections)
+                    {
+                        SendMessage(clientConnection, MessageType.PlayerListResponse, new PlayerList
+                        {
+                            Players = GetAdjustedPlayersList(clientConnection)
+                        });
+                    }
+
                     break;
                 default:
                     RemoteStatusBox.Items.Add($"ERROR: Received unknown message type! `{message.MessageType}`");
@@ -309,28 +295,27 @@ namespace Acquire.Frames
             }
         }
 
-        // TODO: Use this to send the players list from the connecting remote and also when the Start sequence begins
-        //case MessageType.PlayerListRequest:
-        //PlayerList players = new PlayerList
-        //{
-        //    Players = GetAdjustedPlayersList()
-        //};
-        //Utilities.SendMessageToConnection(connection, Utilities.GetNetworkMessageString(players, hostPlayer.GetAddressEndPoint(), MessageType.PlayerListResponse));
-        //break;
-
+        /// <summary>
+        /// TODO: Comment
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Connection_Disconnected(object sender, EventArgs e)
         {
             Connection connection = (Connection)sender;
             if (connection.Socket.RemoteEndPoint is IPEndPoint endpoint)
             {
-                AddRemoteStatusMessage($"Lost connection from {endpoint.Address}:{endpoint.Port}");
-            }
-            else
-            {
-                AddRemoteStatusMessage("Lost connection");
+                string endpointId = GetEndPointId(endpoint);
+                AddRemoteStatusMessage($"Lost connection from {endpointId}");
+                remotePlayers.Remove(endpointId);
             }
         }
 
+        /// <summary>
+        /// TODO: Comment
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void CloseServerButton_Click(object sender, EventArgs e)
         {
             MinimumSize = originalSize;
@@ -351,29 +336,152 @@ namespace Acquire.Frames
 
         #region Helpers
 
+        /// <summary>
+        /// TODO: Comment
+        /// </summary>
+        /// <param name="client"></param>
+        /// <param name="type"></param>
+        /// <param name="data"></param>
+        private static void SendMessage(Connection client, MessageType type, AcquireNetworkModel data = null)
+        {
+            Utilities.SendMessageToConnection(client, data, type);
+        }
+
+        /// <summary>
+        /// TODO: Comment
+        /// </summary>
+        /// <param name="message"></param>
         private void AddRemoteStatusMessage(string message)
         {
             Utilities.InvokeOnControl(RemoteStatusBox, () => RemoteStatusBox.Items.Add(message));
         }
 
-        private List<Player> GetAdjustedPlayersList()
+        /// <summary>
+        /// TODO: Comment
+        /// </summary>
+        /// <param name="client"></param>
+        /// <returns></returns>
+        private List<Player> GetAdjustedPlayersList(Connection client)
         {
             List<Player> players = new List<Player>();
             foreach (IPlayer player in Players)
             {
-                // Change local players to remote players so each connecting game knows how to handle things correctly
+                // Change the local players for the destination client to be "remote"
                 if (player.Type == PlayerType.Local)
                 {
-                    players.Add(new RemotePlayer(player.PlayerId, hostPlayer.GetAddressEndPoint(), player.IsHost, player.Name));
+                    players.Add(new RemotePlayer(player.PlayerId, hostPlayer.GetAddress(), player.IsHost, player.Name));
                 }
-
-                // TODO: Exclude the players from the asking client if they are in this list already?
-
-                players.Add((Player)player);
+                // Change the remote players for the destination client to be "local"
+                else if (player.Type == PlayerType.Remote && IsPlayerFromConnection(player as RemotePlayer, client.Socket.RemoteEndPoint as IPEndPoint))
+                {
+                    players.Add(new Player(player.Name, PlayerType.Local, player.PlayerId, player.IsHost));
+                }
+                else
+                {
+                    players.Add((Player)player);
+                }
             }
+
             return players;
         }
 
-    #endregion
+        /// <summary>
+        /// TODO: Comment
+        /// </summary>
+        /// <param name="player"></param>
+        /// <param name="endpoint"></param>
+        /// <returns></returns>
+        private static bool IsPlayerFromConnection(IRemotePlayer player, IPEndPoint endpoint)
+        {
+            if (player?.Endpoint == null || endpoint == null)
+            {
+                return false;
+            }
+
+            return player.Endpoint.Address.Equals(endpoint.Address) &&
+                   player.Endpoint.Port == endpoint.Port;
+        }
+
+        /// <summary>
+        /// TODO: Comment
+        /// </summary>
+        /// <param name="endpoint"></param>
+        /// <returns></returns>
+        private static string GetEndPointId(IPEndPoint endpoint) => $"{endpoint.Address}:{endpoint.Port}";
+
+        /// <summary>
+        /// TODO: Comment
+        /// </summary>
+        /// <returns></returns>
+        private List<IPlayer> GetPlayers() => new List<IPlayer>(Players).Concat(remotePlayers.SelectMany(d => d.Value)).ToList();
+
+        /// <summary>
+        /// TODO: Comment
+        /// </summary>
+        /// <returns></returns>
+        private bool LoadPlayersList()
+        {
+            // Create a list of the PSPs to make it easier and quicker to run the same code on each
+            IEnumerable<PlayerSetupPanel> setupPanels = Controls.OfType<PlayerSetupPanel>();
+            // Clear the current list of players
+            Players.Clear();
+            // The list of current player names (to eliminate duplicates)
+            List<string> playerNames = new List<string>();
+
+            // For each panel...
+            foreach (PlayerSetupPanel panel in setupPanels)
+            {
+                // If we are not joining, continue
+                if (!panel.IsJoining())
+                {
+                    continue;
+                }
+
+                // Check if the player is ready
+                if (!panel.IsReady())
+                {
+                    // Tell the user who isn't ready
+                    if (panel.GetPlayerType() != PlayerType.AI)
+                    {
+                        MessageBox.Show($@"{panel.GetName()} is not ready yet.", @"Player not ready", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    else
+                    {
+                        MessageBox.Show(@"AI Player is not set to ready yet.", @"AI not set to ready", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+
+                    return false;
+                }
+
+                // TODO: Figure out how to handle this for remote players. Maybe have it as part of the handshake and force a remote player to append a number then?
+
+                // Get the current name
+                string name = panel.GetName();
+
+                // Make sure there are no duplicates
+                if (playerNames.Contains(name))
+                {
+                    // Find a number to add to the end to make it unique
+                    for (int i = 2; i <= 9; i++)
+                    {
+                        if (!playerNames.Contains($"{name} ({i})"))
+                        {
+                            name += $" ({i})";
+                            break;
+                        }
+                    }
+                }
+
+                // Add this name to the list of names used
+                playerNames.Add(name);
+
+                // Create the player of the correct type
+                Players.Add(panel.GetPlayer(name));
+            }
+
+            return true;
+        }
+
+        #endregion
     }
 }

@@ -1,5 +1,4 @@
-﻿using System.Net;
-using Acquire.Enums;
+﻿using Acquire.Enums;
 
 namespace Acquire.NetworkModels
 {
@@ -7,7 +6,6 @@ namespace Acquire.NetworkModels
     {
         #region Public Variables
 
-        public string SourceAddress { get; set; }
         public MessageType MessageType { get; set; }
         public AcquireNetworkModel Data { get; set; }
 
@@ -15,10 +13,9 @@ namespace Acquire.NetworkModels
 
         public NetworkMessage() { }
 
-        public NetworkMessage(AcquireNetworkModel data, IPEndPoint endpoint, MessageType type)
+        public NetworkMessage(AcquireNetworkModel data, MessageType type)
         {
             Data = data;
-            SourceAddress = $"{endpoint.Address}:{endpoint.Port}";
             MessageType = type;
         }
     }

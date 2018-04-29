@@ -80,8 +80,13 @@ namespace Acquire
             return connection.MessageEncoding.GetString(connection.MessageEncoding.GetBytes(message).Skip(4).ToArray());
         }
 
-        public static string GetNetworkMessageString(AcquireNetworkModel model, IPEndPoint endpoint, MessageType type)
-            => JsonConvert.SerializeObject(new NetworkMessage(model, endpoint, type));
+        public static string GetNetworkMessageString(AcquireNetworkModel model, MessageType type)
+            => JsonConvert.SerializeObject(new NetworkMessage(model, type));
+
+        public static void SendMessageToConnection(Connection connection, AcquireNetworkModel model, MessageType type)
+        {
+            SendMessageToConnection(connection, GetNetworkMessageString(model, type));
+        }
 
         public static void SendMessageToConnection(Connection connection, string message)
         {

@@ -1,22 +1,48 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Windows.Forms;
 using Acquire.Enums;
+using Acquire.Models;
+using Acquire.Models.Interfaces;
 using Acquire.NetworkModels;
-using Newtonsoft.Json;
 using SocketMessaging;
 using TcpClient = SocketMessaging.TcpClient;
 
 namespace Acquire.Forms
 {
+    /// <summary>
+    /// TODO: Comment this whole class
+    /// </summary>
     public partial class RemoteConnectForm : Form
     {
-        private TcpClient client;
-        private readonly IPEndPoint endpoint;
+        #region Public Variables
 
-        public RemoteConnectForm(IPEndPoint endpoint)
+        /// <summary>
+        /// The list of players for the fully connected game
+        /// </summary>
+        public List<Player> Players { get; private set; }
+
+        #endregion
+
+        #region Private Member Variables
+
+        // The client used to connect to the remote host
+        private TcpClient client;
+
+        // The endpoint that the remote host is being hosted on
+        private readonly IPEndPoint remoteEndpoint;
+
+        // The list of players coming from this client
+        private readonly List<Player> localPlayers;
+
+        #endregion
+
+        public RemoteConnectForm(IPEndPoint endpoint, IEnumerable<IPlayer> players)
         {
-            this.endpoint = endpoint;
+            remoteEndpoint = endpoint;
+            localPlayers = new List<Player>(players.Cast<Player>());
 
             InitializeComponent();
             InitiateConnection();
@@ -24,10 +50,10 @@ namespace Acquire.Forms
 
         private void InitiateConnection()
         {
-            AddRemoteStatusMessage($"Connecting to {endpoint.Address}:{endpoint.Port}...");
+            AddRemoteStatusMessage($"Connecting to {remoteEndpoint.Address}:{remoteEndpoint.Port}...");
             try
             {
-                client = TcpClient.Connect(endpoint.Address, endpoint.Port);
+                client = TcpClient.Connect(remoteEndpoint.Address, remoteEndpoint.Port);
                 client.ReceivedMessage += Client_ReceivedMessage;
                 client.Disconnected += Client_Disconnected;
                 client.SetMode(MessageMode.PrefixedLength);
@@ -55,14 +81,13 @@ namespace Acquire.Forms
             NetworkMessage message = Utilities.GetMessageFromConnection<NetworkMessage>(client);
             switch (message.MessageType) {
                 case MessageType.Connect:
-                    // Just sit waiting until the server sends us data
-                    AddRemoteStatusMessage("Connected!");
+                    HandleConnectMessage();
                     break;
                 case MessageType.PlayerListResponse:
-                    AddRemoteStatusMessage("Received list of players");
-                    PlayerList players = message.Data as PlayerList;
-                    // TODO: Do something with the player list
-                    // Start the game
+                    HandlePlayersListMessage(message);
+                    break;
+                case MessageType.GameStart:
+                    HandlePlayersListMessage(message);
                     StartGame();
                     break;
                 default:
@@ -73,7 +98,7 @@ namespace Acquire.Forms
 
         private void Client_Disconnected(object sender, EventArgs e)
         {
-            AddRemoteStatusMessage($"Lost connection from {endpoint.Address}:{endpoint.Port}");
+            AddRemoteStatusMessage($"Lost connection from {remoteEndpoint.Address}:{remoteEndpoint.Port}");
         }
 
         private void CancelConnectButton_Click(object sender, EventArgs e)
@@ -93,12 +118,42 @@ namespace Acquire.Forms
             client.ReceivedMessage -= Client_ReceivedMessage;
             client.Disconnected -= Client_Disconnected;
             DialogResult = DialogResult.OK;
+            Close();
         }
 
-        private void SendMessage(MessageType type)
+        private void HandleConnectMessage()
         {
-            NetworkMessage message = new NetworkMessage(null, endpoint, type);
-            Utilities.SendMessageToConnection(client, JsonConvert.SerializeObject(message));
+            AddRemoteStatusMessage("Connected!");
+            // Send player list to the server
+            PlayerList playersMessage = new PlayerList
+            {
+                Players = localPlayers.Where(p => p.Type != PlayerType.Remote).ToList()
+            };
+            SendMessage(MessageType.PlayerListResponse, playersMessage);
+        }
+
+        private void HandlePlayersListMessage(NetworkMessage message)
+        {
+            AddRemoteStatusMessage("Received list of players");
+            // TODO: Fix this always being null
+            if (!(message.Data is PlayerList players))
+            {
+                AddRemoteStatusMessage("ERROR: Failed to receive player list");
+                return;
+            }
+
+            AddRemoteStatusMessage("Current player counts:");
+            AddRemoteStatusMessage($"Local players: {players.LocalCount}");
+            AddRemoteStatusMessage($"Remote players: {players.RemoteCount}");
+            AddRemoteStatusMessage($"Ai players: {players.AICount}");
+
+            // Save the list of players to use for the game when we start
+            Players = players.Players;
+        }
+
+        private void SendMessage(MessageType type, AcquireNetworkModel data = null)
+        {
+            Utilities.SendMessageToConnection(client, data, type);
         }
 
         private void AddRemoteStatusMessage(string message)

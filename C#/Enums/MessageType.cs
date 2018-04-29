@@ -6,8 +6,10 @@
         Connect,
         PlayerListRequest,
         PlayerListResponse,
+        PlayerMessage,
         TurnNotification,
         TurnComplete,
+        GameStart,
         GameOver
     }
 }
