@@ -194,10 +194,11 @@ namespace Acquire.Frames
         }
 
         /// <summary>
-        /// TODO: Comment
+        /// Handles opening the server connection panel and begins listening for remote connections
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        ///
+        /// <param name="sender">The object that initiated the event</param>
+        /// <param name="e">The event args</param>
         private void OpenServerButton_Click(object sender, EventArgs e)
         {
             // Make sure we have a list of players to broadcast
@@ -228,10 +229,11 @@ namespace Acquire.Frames
         }
 
         /// <summary>
-        /// TODO: Comment
+        /// Handles a new remote connection being established to this server
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        ///
+        /// <param name="sender">The object that initiated the event</param>
+        /// <param name="e">The event args</param>
         private void Server_Connected(object sender, ConnectionEventArgs e)
         {
             // Update the UI
@@ -260,10 +262,11 @@ namespace Acquire.Frames
         }
 
         /// <summary>
-        /// TODO: Comment
+        /// Handles receiving a message from a remote connection
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        ///
+        /// <param name="sender">The object that initiated the event</param>
+        /// <param name="e">The event args</param>
         private void Connection_ReceivedMessage(object sender, EventArgs e)
         {
             Connection connection = sender as Connection;
@@ -296,10 +299,11 @@ namespace Acquire.Frames
         }
 
         /// <summary>
-        /// TODO: Comment
+        /// Handles disconnection of remote connections
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        ///
+        /// <param name="sender">The object that initiated the event</param>
+        /// <param name="e">The event args</param>
         private void Connection_Disconnected(object sender, EventArgs e)
         {
             Connection connection = (Connection)sender;
@@ -312,10 +316,11 @@ namespace Acquire.Frames
         }
 
         /// <summary>
-        /// TODO: Comment
+        /// Handles closing the server connection panel and stops listening for remote connections
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        ///
+        /// <param name="sender">The object that initiated the event</param>
+        /// <param name="e">The event args</param>
         private void CloseServerButton_Click(object sender, EventArgs e)
         {
             MinimumSize = originalSize;
@@ -337,30 +342,34 @@ namespace Acquire.Frames
         #region Helpers
 
         /// <summary>
-        /// TODO: Comment
+        /// Sends the given <paramref name="data"/> of type <paramref name="type"/> to the specified <paramref name="client"/>
         /// </summary>
-        /// <param name="client"></param>
-        /// <param name="type"></param>
-        /// <param name="data"></param>
+        ///
+        /// <param name="client">The client to send the message to</param>
+        /// <param name="type">The type of message being sent</param>
+        /// <param name="data">The message to send</param>
         private static void SendMessage(Connection client, MessageType type, AcquireNetworkModel data = null)
         {
             Utilities.SendMessageToConnection(client, data, type);
         }
 
         /// <summary>
-        /// TODO: Comment
+        /// Adds a message to the remote status message panel
         /// </summary>
-        /// <param name="message"></param>
+        ///
+        /// <param name="message">The message to display</param>
         private void AddRemoteStatusMessage(string message)
         {
             Utilities.InvokeOnControl(RemoteStatusBox, () => RemoteStatusBox.Items.Add(message));
         }
 
         /// <summary>
-        /// TODO: Comment
+        /// Generates a list of players connected to this server, adjusted so that <paramref name="client"/>'s players are shown as <seealso cref="PlayerType.Local"/> and playesr local to the server are shown as <seealso cref="PlayerType.Remote"/>
         /// </summary>
-        /// <param name="client"></param>
-        /// <returns></returns>
+        ///
+        /// <param name="client">The client that this list is being sent to</param>
+        ///
+        /// <returns>The generated list of adjusted players</returns>
         private List<Player> GetAdjustedPlayersList(Connection client)
         {
             List<Player> players = new List<Player>();
@@ -386,11 +395,13 @@ namespace Acquire.Frames
         }
 
         /// <summary>
-        /// TODO: Comment
+        /// Determines whether the given <paramref name="player"/> is from the specified <paramref name="endpoint"/>
         /// </summary>
-        /// <param name="player"></param>
-        /// <param name="endpoint"></param>
-        /// <returns></returns>
+        ///
+        /// <param name="player">The player to check</param>
+        /// <param name="endpoint">The endpoint to check</param>
+        ///
+        /// <returns>True if the <paramref name="player"/> is from the <paramref name="endpoint"/>, false otherwise</returns>
         private static bool IsPlayerFromConnection(IRemotePlayer player, IPEndPoint endpoint)
         {
             if (player?.Endpoint == null || endpoint == null)
@@ -403,22 +414,26 @@ namespace Acquire.Frames
         }
 
         /// <summary>
-        /// TODO: Comment
+        /// Gets a string representation of the <paramref name="endpoint"/>
         /// </summary>
-        /// <param name="endpoint"></param>
-        /// <returns></returns>
+        ///
+        /// <param name="endpoint">The endpoint generate a string for</param>
+        ///
+        /// <returns>The string representation of the <paramref name="endpoint"/></returns>
         private static string GetEndPointId(IPEndPoint endpoint) => $"{endpoint.Address}:{endpoint.Port}";
 
         /// <summary>
-        /// TODO: Comment
+        /// Gets the list of all the currently connected players
         /// </summary>
-        /// <returns></returns>
+        ///
+        /// <returns>The list of all the currently connected players</returns>
         private List<IPlayer> GetPlayers() => new List<IPlayer>(Players).Concat(remotePlayers.SelectMany(d => d.Value)).ToList();
 
         /// <summary>
-        /// TODO: Comment
+        /// Loads the list of local players from the created player panels
         /// </summary>
-        /// <returns></returns>
+        ///
+        /// <returns>True if there were not errors, false if there were</returns>
         private bool LoadPlayersList()
         {
             // Create a list of the PSPs to make it easier and quicker to run the same code on each
