@@ -299,7 +299,7 @@ namespace Acquire.Models
         /// <returns>The company's current price as calculated</returns>
         public int GetPrice(int size)
         {
-            int currentSize = size;
+            int currentSize = Size;
 
             Size = size;
             int price = GetPrice();
