@@ -292,8 +292,6 @@ namespace Acquire.Frames
         /// <param name="connection">The connection the message came from</param>
         private void HandlePlayerListResponse(PlayerList message, Connection connection)
         {
-            // TODO: Figure out why this is always null
-            // BUG: #3
             List<Player> newPlayers = message?.Players;
             if (newPlayers == null)
             {
@@ -303,9 +301,10 @@ namespace Acquire.Frames
             }
 
             // Negotiate player limits
-            if (remotePlayers.Count + newPlayers.Count > Game.MAX_PLAYERS)
+            int playerCount = remotePlayers.Count + Players.Count;
+            if (playerCount + newPlayers.Count > Game.MAX_PLAYERS)
             {
-                string tooManyMessage = $"The {newPlayers.Count} added to the {remotePlayers.Count} existing exceeds the maximum of {Game.MAX_PLAYERS}";
+                string tooManyMessage = $"The {newPlayers.Count} added to the {playerCount} existing exceeds the maximum of {Game.MAX_PLAYERS}";
                 RemoteStatusBox.Items.Add($"Received too many players from {GetEndPointId(connection.Socket.RemoteEndPoint as IPEndPoint)}, disconnecting. {tooManyMessage}");
                 // Send rejection message
                 SendMessage(connection, MessageType.Disconnect, new Disconnect
@@ -317,8 +316,8 @@ namespace Acquire.Frames
             }
 
             // Negotiate player names
-            List<string> remotePlayerNames = remotePlayers.Values.SelectMany(p => p.Select(rp => rp.Name)).ToList();
-            List<Player> duplicateNames = newPlayers.Where(p => remotePlayerNames.Any(rpn => rpn.Equals(p.Name, StringComparison.OrdinalIgnoreCase))).ToList();
+            List<string> playerNames = remotePlayers.Values.SelectMany(p => p.Select(rp => rp.Name)).Concat(Players.Select(p => p.Name)).ToList();
+            List<Player> duplicateNames = newPlayers.Where(p => playerNames.Any(rpn => rpn.Equals(p.Name, StringComparison.OrdinalIgnoreCase))).ToList();
             if (duplicateNames.Any())
             {
                 PlayerRename renames = new PlayerRename();
@@ -326,8 +325,8 @@ namespace Acquire.Frames
                 // Generate list of names that need to be replaced
                 foreach (Player player in duplicateNames)
                 {
-                    string newName = Utilities.GetUniqueName(player.Name, remotePlayerNames);
-                    remotePlayerNames.Add(newName);
+                    string newName = Utilities.GetUniqueName(player.Name, playerNames);
+                    playerNames.Add(newName);
 
                     renames.PlayerRenames.Add(new PlayerRenameItem
                     {

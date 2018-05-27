@@ -142,8 +142,6 @@ namespace Acquire.Forms
         private void HandlePlayersListMessage(NetworkMessage message)
         {
             AddRemoteStatusMessage("Received list of players");
-            // TODO: Fix this always being null
-            // BUG: #3
             if (!(message.Data is PlayerList players))
             {
                 AddRemoteStatusMessage("ERROR: Failed to receive player list");

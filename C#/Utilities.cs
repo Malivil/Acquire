@@ -67,7 +67,10 @@ namespace Acquire
         }
 
         public static T GetMessageFromConnection<T>(Connection connection)
-            => JsonConvert.DeserializeObject<T>(GetMessageFromConnection(connection));
+            => GetTypeFromString<T>(GetMessageFromConnection(connection));
+
+        public static T GetTypeFromString<T>(string message)
+            => JsonConvert.DeserializeObject<T>(message, new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto });
 
         public static string GetMessageFromConnection(Connection connection)
         {
@@ -82,7 +85,7 @@ namespace Acquire
         }
 
         public static string GetNetworkMessageString(AcquireNetworkModel model, MessageType type)
-            => JsonConvert.SerializeObject(new NetworkMessage(model, type));
+            => JsonConvert.SerializeObject(new NetworkMessage(model, type), new JsonSerializerSettings {TypeNameHandling = TypeNameHandling.Auto});
 
         public static void SendMessageToConnection(Connection connection, AcquireNetworkModel model, MessageType type)
         {
