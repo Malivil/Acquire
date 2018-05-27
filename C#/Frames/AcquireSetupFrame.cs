@@ -276,25 +276,80 @@ namespace Acquire.Frames
             switch (message.MessageType)
             {
                 case MessageType.PlayerListResponse:
-                    // Save the players list
-                    remotePlayers[GetEndPointId(connection.Socket.RemoteEndPoint as IPEndPoint)] = (message.Data as PlayerList)?.Players;
-
-                    // TODO: Negotiate player names
-                    // TODO: Negotiate player limits
-
-                    // Broadcast full players list to every connected client
-                    foreach (Connection clientConnection in hostServer.Connections)
-                    {
-                        SendMessage(clientConnection, MessageType.PlayerListResponse, new PlayerList
-                        {
-                            Players = GetAdjustedPlayersList(clientConnection)
-                        });
-                    }
-
+                    HandlePlayerListResponse(message.Data as PlayerList, connection);
                     break;
                 default:
                     RemoteStatusBox.Items.Add($"ERROR: Received unknown message type! `{message.MessageType}`");
                     break;
+            }
+        }
+
+        /// <summary>
+        /// Handles the player list response data
+        /// </summary>
+        ///
+        /// <param name="message">The player list response message</param>
+        /// <param name="connection">The connection the message came from</param>
+        private void HandlePlayerListResponse(PlayerList message, Connection connection)
+        {
+            // TODO: Figure out why this is always null
+            // BUG: #3
+            List<Player> newPlayers = message?.Players;
+            if (newPlayers == null)
+            {
+                RemoteStatusBox.Items.Add($"ERROR: Received invalid player list from {GetEndPointId(connection.Socket.RemoteEndPoint as IPEndPoint)}, disconnecting");
+                connection.Close();
+                return;
+            }
+
+            // Negotiate player limits
+            if (remotePlayers.Count + newPlayers.Count > Game.MAX_PLAYERS)
+            {
+                string tooManyMessage = $"The {newPlayers.Count} added to the {remotePlayers.Count} existing exceeds the maximum of {Game.MAX_PLAYERS}";
+                RemoteStatusBox.Items.Add($"Received too many players from {GetEndPointId(connection.Socket.RemoteEndPoint as IPEndPoint)}, disconnecting. {tooManyMessage}");
+                // Send rejection message
+                SendMessage(connection, MessageType.Disconnect, new Disconnect
+                {
+                    Message = tooManyMessage
+                });
+                connection.Close();
+                return;
+            }
+
+            // Negotiate player names
+            List<string> remotePlayerNames = remotePlayers.Values.SelectMany(p => p.Select(rp => rp.Name)).ToList();
+            List<Player> duplicateNames = newPlayers.Where(p => remotePlayerNames.Any(rpn => rpn.Equals(p.Name, StringComparison.OrdinalIgnoreCase))).ToList();
+            if (duplicateNames.Any())
+            {
+                PlayerRename renames = new PlayerRename();
+
+                // Generate list of names that need to be replaced
+                foreach (Player player in duplicateNames)
+                {
+                    string newName = Utilities.GetUniqueName(player.Name, remotePlayerNames);
+                    remotePlayerNames.Add(newName);
+
+                    renames.PlayerRenames.Add(new PlayerRenameItem
+                    {
+                        PlayerId = player.PlayerId,
+                        OriginalName = player.Name,
+                        NewName = newName
+                    });
+                }
+                SendMessage(connection, MessageType.PlayerRename, renames);
+                return;
+            }
+
+            // Save the players list
+            remotePlayers[GetEndPointId(connection.Socket.RemoteEndPoint as IPEndPoint)] = newPlayers;
+
+            // Broadcast full players list to every connected client
+            foreach (Connection clientConnection in hostServer.Connections)
+            {
+                SendMessage(clientConnection, MessageType.PlayerListResponse, new PlayerList
+                {
+                    Players = GetAdjustedPlayersList(clientConnection)
+                });
             }
         }
 
@@ -468,24 +523,8 @@ namespace Acquire.Frames
                     return false;
                 }
 
-                // TODO: Figure out how to handle this for remote players. Maybe have it as part of the handshake and force a remote player to append a number then?
-
-                // Get the current name
-                string name = panel.GetName();
-
-                // Make sure there are no duplicates
-                if (playerNames.Contains(name))
-                {
-                    // Find a number to add to the end to make it unique
-                    for (int i = 2; i <= 9; i++)
-                    {
-                        if (!playerNames.Contains($"{name} ({i})"))
-                        {
-                            name += $" ({i})";
-                            break;
-                        }
-                    }
-                }
+                // Get a unique form of this player's name
+                string name = Utilities.GetUniqueName(panel.GetName(), playerNames);
 
                 // Add this name to the list of names used
                 playerNames.Add(name);

@@ -83,8 +83,15 @@ namespace Acquire.Forms
                 case MessageType.Connect:
                     HandleConnectMessage();
                     break;
+                case MessageType.Disconnect:
+                    AddRemoteStatusMessage($"ERROR: {(message.Data as Disconnect)?.Message}. Disconnected from the host");
+                    CancelConnectButton_Click(null, EventArgs.Empty);
+                    break;
                 case MessageType.PlayerListResponse:
                     HandlePlayersListMessage(message);
+                    break;
+                case MessageType.PlayerRename:
+                    HandlePlayerRename(message.Data as PlayerRename);
                     break;
                 case MessageType.GameStart:
                     HandlePlayersListMessage(message);
@@ -136,6 +143,7 @@ namespace Acquire.Forms
         {
             AddRemoteStatusMessage("Received list of players");
             // TODO: Fix this always being null
+            // BUG: #3
             if (!(message.Data is PlayerList players))
             {
                 AddRemoteStatusMessage("ERROR: Failed to receive player list");
@@ -149,6 +157,11 @@ namespace Acquire.Forms
 
             // Save the list of players to use for the game when we start
             Players = players.Players;
+        }
+
+        private void HandlePlayerRename(PlayerRename player)
+        {
+            // TODO:
         }
 
         private void SendMessage(MessageType type, AcquireNetworkModel data = null)

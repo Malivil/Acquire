@@ -13,6 +13,11 @@ namespace Acquire.Models
         #region Public Member Variables
 
         /// <summary>
+        /// The maximum number of players this game supports
+        /// </summary>
+        public const int MAX_PLAYERS = 6;
+
+        /// <summary>
         /// The player whose turn it is now
         /// </summary>
         public static IPlayer CurrentPlayer { get; private set; }

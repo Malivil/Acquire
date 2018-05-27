@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -112,6 +113,22 @@ namespace Acquire
             {
                 action();
             }
+        }
+
+        #endregion
+
+        #region Players
+
+        public static string GetUniqueName(string name, List<string> otherNames)
+        {
+            string newName = name.Clone().ToString();
+            // Find a number to add to the end to make it unique
+            for (int i = 2; otherNames.Contains(newName); i++)
+            {
+                newName = $"{name} ({i})";
+            }
+
+            return newName;
         }
 
         #endregion

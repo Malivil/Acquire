@@ -78,6 +78,7 @@
     <Compile Include="Frames\AcquireSetupFrame.Designer.cs">
       <DependentUpon>AcquireSetupFrame.cs</DependentUpon>
     </Compile>
+    <Compile Include="NetworkModels\Disconnect.cs" />
     <Compile Include="NetworkModels\AcquireNetworkModel.cs" />
     <Compile Include="Models\AIPlayer.cs" />
     <Compile Include="Forms\BuyShareForm.cs">
@@ -107,6 +108,8 @@
     <Compile Include="Models\Interfaces\IRemotePlayer.cs" />
     <Compile Include="NetworkModels\NetworkMessage.cs" />
     <Compile Include="NetworkModels\PlayerList.cs" />
+    <Compile Include="NetworkModels\PlayerRename.cs" />
+    <Compile Include="NetworkModels\PlayerRenameItem.cs" />
     <Compile Include="Panels\GridPanel.cs">
       <SubType>UserControl</SubType>
     </Compile>

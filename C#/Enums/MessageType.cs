@@ -4,9 +4,11 @@
     {
         Unknown,
         Connect,
+        Disconnect,
         PlayerListRequest,
         PlayerListResponse,
         PlayerMessage,
+        PlayerRename,
         TurnNotification,
         TurnComplete,
         GameStart,
