@@ -46,7 +46,7 @@ namespace Acquire.Panels
             foreach (Company company in Game.Companies)
             {
                 // Put each company, the amount of stock the player has
-                toolTipText += $"{company.GetName()}: {player.GetShares(company.GetName())} ";
+                toolTipText += $"{company.Name}: {player.GetShares(company.Name)} ";
                 // And whether or not they are a holder of some type
                 if (player.IsMajorityHolder(company))
                 {

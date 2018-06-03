@@ -45,7 +45,9 @@ namespace Acquire.Panels
 
                 // Highlight the current player
                 if (i == 0)
+                {
                     panel.BackColor = Color.LightGray;
+                }
 
                 // Add the panel to the list
                 Controls.Add(panel);

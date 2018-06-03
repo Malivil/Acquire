@@ -18,8 +18,17 @@ namespace Acquire
         /// </summary>
         public static readonly string[] STANDARD_NUPROG = {"a", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30"};
 
+        /// <summary>
+        /// Indicates a normal log message with no logic
+        /// </summary>
         public const string NORMAL_TYPE = "Norm";
+        /// <summary>
+        /// Indicates a dynamic log message which replaces the previous message
+        /// </summary>
         public const string DYNAMIC_TYPE = "Dyn";
+        /// <summary>
+        /// Indicates a dynamic log message with specific logic regarding company shares
+        /// </summary>
         public const string SHARES_TYPE = "ShareS";
 
         #endregion

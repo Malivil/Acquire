@@ -33,8 +33,8 @@ namespace Acquire.Forms
             this.company = company;
 
             // Update the label with the company's name
-            HowManyLabel.Text = $@"How many shares of {company.GetName()} would you like to buy?";
-            Text = $@"Buying shares of {company.GetName()}";
+            HowManyLabel.Text = $@"How many shares of {company.Name} would you like to buy?";
+            Text = $@"Buying shares of {company.Name}";
 
             // Add 0 as a default
             SharesComboBox.Items.Add(0);

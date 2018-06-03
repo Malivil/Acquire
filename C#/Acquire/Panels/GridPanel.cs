@@ -38,7 +38,7 @@ namespace Acquire.Panels
         /// <summary>
         /// The squares that are left to give to players
         /// </summary>
-        public static List<Square> SquareBag { get; } = new List<Square>();
+        public static List<Square> SquareBag { get; private set; } = new List<Square>();
 
         #endregion
 
@@ -50,12 +50,12 @@ namespace Acquire.Panels
             InitializeComponent();
 
             // The range of letters used to label the squares
-            const string alphabet = "ABCDEFGHI";
+            const string alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
             // Create and place all 9x12 squares
-            for (int i = 0; i < 9; i++)
+            for (int i = 0; i < Squares.GetLength(0); i++)
             {
-                for (int j = 0; j < 12; j++)
+                for (int j = 0; j < Squares.GetLength(1); j++)
                 {
                     // Create a new square with the right letter and number
                     Squares[i, j] = new Square(alphabet[i] + (j + 1).ToString())
@@ -69,14 +69,16 @@ namespace Acquire.Panels
 
                     // Add each square to the bag
                     if (!SquareBag.Contains(Squares[i, j]))
+                    {
                         SquareBag.Add(Squares[i, j]);
+                    }
                 }
             }
 
             // For each square
-            for (int i = 0; i < 9; i++)
+            for (int i = 0; i < Squares.GetLength(0); i++)
             {
-                for (int j = 0; j < 12; j++)
+                for (int j = 0; j < Squares.GetLength(1); j++)
                 {
                     // Find the squares to the left
                     Square left = i != 0 ? Squares[i - 1, j] : null;
@@ -102,33 +104,16 @@ namespace Acquire.Panels
         #region Action Methods
 
         /// <summary>
-        /// Shuffles the bag of squares using two randomly generated numbers 100 times
+        /// Shuffles the bag of squares into a pseudo-random order
         /// </summary>
         public void ShuffleBag()
         {
             // Don't shuffle an empty bag or one with just 1 square
             if (SquareBag.Count > 1)
             {
-                // Our random number generator
                 Random random = new Random();
-                // Get the first two random numbers
-                int n = random.Next(SquareBag.Count);
-                int k = random.Next(SquareBag.Count);
-
-                // Do this 100 times
-                for (int i = 0; i < 100; i++)
-                {
-                    // Get the current square at n
-                    Square temp = SquareBag[n];
-                    // Switch the squares at n and k
-                    SquareBag[n] = SquareBag[k];
-                    // Put the n square where k was
-                    SquareBag[k] = temp;
-
-                    // Get new random numbers
-                    n = random.Next(SquareBag.Count);
-                    k = random.Next(SquareBag.Count);
-                }
+                // Order by a random number
+                SquareBag = SquareBag.OrderBy(a => random.Next()).ToList();
             }
         }
 
@@ -137,9 +122,9 @@ namespace Acquire.Panels
         /// </summary>
         public static void CheckSquares()
         {
-            for (int i = 0; i < 9; i++)
+            for (int i = 0; i < Squares.GetLength(0); i++)
             {
-                for (int j = 0; j < 12; j++)
+                for (int j = 0; j < Squares.GetLength(1); j++)
                 {
                     Squares[i, j].CheckSquare();
                 }
@@ -155,28 +140,27 @@ namespace Acquire.Panels
         /// 
         /// <param name="square">The square attempting to be placed</param>
         /// 
-        /// <returns>Null if the square was not able to be places, an arbitrary value otherwise</returns>
-        public static object PlaceSquare(Square square)
+        /// <returns>True if the square was able to be placed, false otherwise</returns>
+        public static bool PlaceSquare(Square square)
         {
             // Only place a square if it is placeable
             if (square.CanBePlaced)
             {
                 // Can't place a dead square
-                if (square.GetState() != Square.STATE_DEAD)
+                if (square.State != SquareState.Dead)
                 {
                     // If there are no other squares around, just put this one down and be done with it
-                    if ((square.LeftSquare == null || square.LeftSquare.GetState() < Square.STATE_PLACED) &&
-                        (square.RightSquare == null || square.RightSquare.GetState() < Square.STATE_PLACED) &&
-                        (square.TopSquare == null || square.TopSquare.GetState() < Square.STATE_PLACED) &&
-                        (square.BottomSquare == null || square.BottomSquare.GetState() < Square.STATE_PLACED))
+                    if ((square.LeftSquare == null || square.LeftSquare.State < SquareState.Placed) &&
+                        (square.RightSquare == null || square.RightSquare.State < SquareState.Placed) &&
+                        (square.TopSquare == null || square.TopSquare.State < SquareState.Placed) &&
+                        (square.BottomSquare == null || square.BottomSquare.State < SquareState.Placed))
                     {
                         // Update the state
-                        square.SetState(Square.STATE_PLACED);
+                        square.SetState(SquareState.Placed);
                         // Update the log
                         LogMaster.Log($"{Game.CurrentPlayer.Name} placed a square at {square}.");
 
-                        // Return random non-null value to show success
-                        return 1;
+                        return true;
                     }
 
                     // List of surrounding viable squares
@@ -208,10 +192,10 @@ namespace Acquire.Panels
                 }
 
                 LogMaster.Log("Two or more of the companies you are trying to merge are safe.");
-                return null;
+                return false;
             }
 
-            return 1;
+            return true;
         }
 
         /// <summary>
@@ -225,23 +209,17 @@ namespace Acquire.Panels
             List<Square> squares = player.Squares;
 
             // Make sure they have 10 at all times
-            while (squares.Count < 10)
+            // and only give them squares if there are some to give
+            while (squares.Count < 10 && SquareBag.Count > 0)
             {
-                // Only give them squares if there are some to give
-                if (SquareBag.Count != 0)
+                // Don't give unplaceable squares
+                if (SquareBag[0].CanBePlaced)
                 {
-                    // Don't give unplaceable squares
-                    if (SquareBag[0].CanBePlaced)
-                    {
-                        squares.Add(SquareBag[0]);
-                    }
-                    // Remove this square from the list
-                    SquareBag.RemoveAt(0);
+                    squares.Add(SquareBag[0]);
                 }
-                else
-                {
-                    break;
-                }
+
+                // Remove this square from the list
+                SquareBag.RemoveAt(0);
             }
 
             // Update the player's list of squares
@@ -261,30 +239,18 @@ namespace Acquire.Panels
             Game.OwnerFrame.GetHandPanel().SetHand(player.Squares);
 
             // Go through each square
-            for (int i = 0; i < 9; i++)
+            for (int i = 0; i < Squares.GetLength(0); i++)
             {
-                for (int j = 0; j < 12; j++)
+                for (int j = 0; j < Squares.GetLength(1); j++)
                 {
-                    // If the player has this square
-                    if (player.Squares.Contains(Squares[i, j]))
+                    // Determine whether this player has this square
+                    bool hasSquare = player.Squares.Contains(Squares[i, j]);
+                    // Change the border on it
+                    Squares[i, j].BorderStyle = hasSquare ? BorderStyle.Fixed3D : BorderStyle.None;
+                    // If it is placeable, change it's state
+                    if (Squares[i, j].CanBePlaced)
                     {
-                        // Put the border on it
-                        Squares[i, j].BorderStyle = BorderStyle.Fixed3D;
-                        // If it is placeable, change it's state
-                        if (Squares[i, j].CanBePlaced)
-                        {
-                            Squares[i, j].SetState(Square.STATE_OPTION);
-                        }
-                    }
-                    else
-                    {
-                        // Otherwise turn off the border
-                        Squares[i, j].BorderStyle = BorderStyle.None;
-                        // And reset the state to open
-                        if (Squares[i, j].CanBePlaced)
-                        {
-                            Squares[i, j].SetState(Square.STATE_OPEN);
-                        }
+                        Squares[i, j].SetState(hasSquare ? SquareState.Placeable : SquareState.Open);
                     }
                 }
             }
@@ -295,9 +261,9 @@ namespace Acquire.Panels
         /// </summary>
         public void EndGame()
         {
-            for (int i = 0; i < 9; i++)
+            for (int i = 0; i < Squares.GetLength(0); i++)
             {
-                for (int j = 0; j < 12; j++)
+                for (int j = 0; j < Squares.GetLength(1); j++)
                 {
                     Squares[i, j].CanBePlaced = false;
                 }
@@ -318,8 +284,8 @@ namespace Acquire.Panels
         /// <param name="squares">The list of squares being merged with <paramref name="instigator"/></param>
         /// <param name="instigator">The square that was placed, causing all this merging business</param>
         /// 
-        /// <returns>Null if the square was not able to be places, an arbitrary value otherwise</returns>
-        private static Company Merge(IList<Square> squares, Square instigator)
+        /// <returns>True if the squares were able to be merged, false otherwise</returns>
+        private static bool Merge(IList<Square> squares, Square instigator)
         {
             // List of possible companies
             List<Company> options = new List<Company>();
@@ -350,7 +316,7 @@ namespace Acquire.Panels
                 if (newCompany == null)
                 {
                     // The new company will be the company in this square
-                    newCompany = square.GetCompany();
+                    newCompany = square.Company;
                     // Get rid of the old options
                     options.Clear();
                     // Add this company to the list of options and newly dead list
@@ -358,10 +324,10 @@ namespace Acquire.Panels
                     newlyDead.Add(newCompany);
                 }
                 // If we already have a company, but the one in this square is bigger
-                else if (square.GetCompany().Size > newCompany.Size)
+                else if (square.Company.Size > newCompany.Size)
                 {
                     // Then store the one in this square
-                    newCompany = square.GetCompany();
+                    newCompany = square.Company;
                     // Add the options we already had to companies who will die
                     destroyedCompanies.AddRange(options);
                     // Clear the options
@@ -371,14 +337,14 @@ namespace Acquire.Panels
                     newlyDead.Add(newCompany);
                 }
                 // If the company in this square is smaller than the current company
-                else if (square.GetCompany().Size < newCompany.Size)
+                else if (square.Company.Size < newCompany.Size)
                 {
                     // It will die
-                    newlyDead.Add(square.GetCompany());
-                    destroyedCompanies.Add(square.GetCompany());
+                    newlyDead.Add(square.Company);
+                    destroyedCompanies.Add(square.Company);
                 }
                 // If they are the same size
-                else if (square.GetCompany().Size == newCompany.Size)
+                else if (square.Company.Size == newCompany.Size)
                 {
                     // Add both to the list of options if they aren't there already
                     if (!options.Contains(newCompany))
@@ -386,26 +352,26 @@ namespace Acquire.Panels
                         options.Add(newCompany);
                     }
 
-                    if (!options.Contains(square.GetCompany()))
+                    if (!options.Contains(square.Company))
                     {
-                        options.Add(square.GetCompany());
+                        options.Add(square.Company);
                     }
 
                     // And to the newly dead list too
                     newlyDead.Add(newCompany);
-                    newlyDead.Add(square.GetCompany());
+                    newlyDead.Add(square.Company);
                 }
             }
 
             // If we have no options
-            if (options.Count == 0)
+            if (!options.Any())
             {
                 // And we have no dead companies
-                if (Game.GetDeadCompanies().Count == 0)
+                if (!Game.GetDeadCompanies().Any())
                 {
                     // Then we have no more to make
                     LogMaster.Log("This square can't be placed because no new companies can be created.");
-                    return null;
+                    return false;
                 }
 
                 // Otherwise we just add the dead companies
@@ -437,15 +403,15 @@ namespace Acquire.Panels
                 }
                 else
                 {
-                    return null;
+                    return false;
                 }
             }
 
             // If companies are being destroyed
-            if (newlyDead.Count > 0)
+            if (newlyDead.Any())
             {
                 // Get each one that isn't the one we're already creating
-                foreach (Company company in newlyDead.Where(c => !c.GetName().Equals(newCompany.GetName())))
+                foreach (Company company in newlyDead.Where(c => !c.Name.Equals(newCompany.Name)))
                 {
                     // Get each player that has shares in this company
                     foreach (IPlayer player in Game.Players.Where(p => p.GetShares(company) > 0))
@@ -464,7 +430,7 @@ namespace Acquire.Panels
                     }
 
                     // Log who is being destroyed
-                    LogMaster.Log($"{Game.CurrentPlayer.Name} has destroyed {company.GetName()} to expand {newCompany.GetName()}.");
+                    LogMaster.Log($"{Game.CurrentPlayer.Name} has destroyed {company.Name} to expand {newCompany.Name}.");
                 }
             }
 
@@ -487,8 +453,8 @@ namespace Acquire.Panels
                 destroyedCompany.Size = 0;
             }
 
-            // Lead the squares with this company
-            return Link(instigator, newCompany);
+            // Link the squares with this company
+            return Link(instigator, newCompany) != null;
         }
 
         /// <summary>
@@ -512,7 +478,7 @@ namespace Acquire.Panels
             // Get the current player
             IPlayer player = Game.CurrentPlayer;
             // If this company is in the active list, it isn't new
-            bool isNew = !ActiveCompanies.Any(c => c.GetName().Equals(newCompany.GetName()));
+            bool isNew = !ActiveCompanies.Any(c => c.Name.Equals(newCompany.Name));
 
             // If it is new, add it to the list of active companies
             if (isNew)
@@ -524,7 +490,7 @@ namespace Acquire.Panels
             if (!newCompany.IsPlaced)
             {
                 // Log that the company is being formed
-                LogMaster.Log($"{player.Name} has formed the {newCompany.GetName()} company.");
+                LogMaster.Log($"{player.Name} has formed the {newCompany.Name} company.");
                 // And give the player the amount of money they need to get 1 "free" share
                 player.GiveMoney(newCompany.GetPrice());
                 player.BuyShare(newCompany, true);
@@ -538,22 +504,22 @@ namespace Acquire.Panels
             instigator.SetCompany(newCompany);
 
             // Check the boundary squares. If there is a square that needs to be taken over, take it over
-            if (instigator.LeftSquare != null && instigator.LeftSquare.GetCompany() != newCompany && instigator.LeftSquare.GetState() > Square.STATE_OPTION)
+            if (instigator.LeftSquare != null && instigator.LeftSquare.Company != newCompany && instigator.LeftSquare.State > SquareState.Placeable)
             {
                 newCompany = Link(instigator.LeftSquare, newCompany);
             }
 
-            if (instigator.RightSquare != null && instigator.RightSquare.GetCompany() != newCompany && instigator.RightSquare.GetState() > Square.STATE_OPTION)
+            if (instigator.RightSquare != null && instigator.RightSquare.Company != newCompany && instigator.RightSquare.State > SquareState.Placeable)
             {
                 newCompany = Link(instigator.RightSquare, newCompany);
             }
 
-            if (instigator.TopSquare != null && instigator.TopSquare.GetCompany() != newCompany && instigator.TopSquare.GetState() > Square.STATE_OPTION)
+            if (instigator.TopSquare != null && instigator.TopSquare.Company != newCompany && instigator.TopSquare.State > SquareState.Placeable)
             {
                 newCompany = Link(instigator.TopSquare, newCompany);
             }
 
-            if (instigator.BottomSquare != null && instigator.BottomSquare.GetCompany() != newCompany && instigator.BottomSquare.GetState() > Square.STATE_OPTION)
+            if (instigator.BottomSquare != null && instigator.BottomSquare.Company != newCompany && instigator.BottomSquare.State > SquareState.Placeable)
             {
                 newCompany = Link(instigator.BottomSquare, newCompany);
             }

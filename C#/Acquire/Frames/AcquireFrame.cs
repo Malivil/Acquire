@@ -38,25 +38,25 @@ namespace Acquire.Frames
 
             // Initialize the company status buttons
             // Luxor
-            LuxorStatusButton.Company = Game.Companies.Single(c => c.GetName() == "Luxor");
+            LuxorStatusButton.Company = Game.Companies.Single(c => c.Name == "Luxor");
             LuxorStatusButton.ImageIcon = LuxorStatusButton.Company.ImageIcon;
             // Tower
-            TowerStatusButton.Company = Game.Companies.Single(c => c.GetName() == "Tower");
+            TowerStatusButton.Company = Game.Companies.Single(c => c.Name == "Tower");
             TowerStatusButton.ImageIcon = TowerStatusButton.Company.ImageIcon;
             // Festival
-            FestivalStatusButton.Company = Game.Companies.Single(c => c.GetName() == "Festival");
+            FestivalStatusButton.Company = Game.Companies.Single(c => c.Name == "Festival");
             FestivalStatusButton.ImageIcon = FestivalStatusButton.Company.ImageIcon;
             // Worldwide
-            WorldwideStatusButton.Company = Game.Companies.Single(c => c.GetName() == "Worldwide");
+            WorldwideStatusButton.Company = Game.Companies.Single(c => c.Name == "Worldwide");
             WorldwideStatusButton.ImageIcon = WorldwideStatusButton.Company.ImageIcon;
             // American
-            AmericanStatusButton.Company = Game.Companies.Single(c => c.GetName() == "American");
+            AmericanStatusButton.Company = Game.Companies.Single(c => c.Name == "American");
             AmericanStatusButton.ImageIcon = AmericanStatusButton.Company.ImageIcon;
             // Continental
-            ContinentalStatusButton.Company = Game.Companies.Single(c => c.GetName() == "Continental");
+            ContinentalStatusButton.Company = Game.Companies.Single(c => c.Name == "Continental");
             ContinentalStatusButton.ImageIcon = ContinentalStatusButton.Company.ImageIcon;
             // Imperial
-            ImperialStatusButton.Company = Game.Companies.Single(c => c.GetName() == "Imperial");
+            ImperialStatusButton.Company = Game.Companies.Single(c => c.Name == "Imperial");
             ImperialStatusButton.ImageIcon = ImperialStatusButton.Company.ImageIcon;
 
             // Load up the logo image
@@ -137,7 +137,7 @@ namespace Acquire.Frames
         /// 
         /// <param name="sender">The object sending the event</param>
         /// <param name="args">The arguments sent</param>
-        private void HelpToolIteClick(object sender, EventArgs args)
+        private void HelpToolItem_Click(object sender, EventArgs args)
         {
             new HelpFrame().ShowDialog();
         }
@@ -148,7 +148,7 @@ namespace Acquire.Frames
         /// 
         /// <param name="sender">The object sending the event</param>
         /// <param name="args">The arguments sent</param>
-        private void AboutMenuIteClick(object sender, EventArgs args)
+        private void AboutMenuItem_Click(object sender, EventArgs args)
         {
             new AboutFrame().ShowDialog();
         }
@@ -159,7 +159,7 @@ namespace Acquire.Frames
         /// 
         /// <param name="sender">The object sending the event</param>
         /// <param name="args">The arguments sent</param>
-        private void QuitMenuIteClick(object sender, EventArgs args)
+        private void QuitMenuItem_Click(object sender, EventArgs args)
         {
             Close();
         }
@@ -407,7 +407,9 @@ namespace Acquire.Frames
         {
             EndTurnButton.Enabled = enable;
             if (enable)
+            {
                 EndTurnButton.Focus();
+            }
         }
 
         #endregion

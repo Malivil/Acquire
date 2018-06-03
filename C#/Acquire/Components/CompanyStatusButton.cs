@@ -39,12 +39,7 @@ namespace Acquire.Components
         protected override void OnPaint(PaintEventArgs args)
         {
             // Only paint if the company and the image have been set
-            if (Company == null)
-            {
-                return;
-            }
-
-            if (ImageIcon == null)
+            if (Company == null || ImageIcon == null)
             {
                 return;
             }
@@ -62,7 +57,7 @@ namespace Acquire.Components
             if (Company.Size >= 11)
             {
                 // Set the company to safe
-                Company.IsSafe(true);
+                Company.IsSafe = true;
 
                 // Update the size string
                 size += " *SAFE*";
@@ -70,13 +65,13 @@ namespace Acquire.Components
             // Otherwise it isn't safe
             else
             {
-                Company.IsSafe(false);
+                Company.IsSafe = false;
             }
 
             // Set this user control image to the stored image
             CompanyImage.Image = ImageIcon;
             // Update the name label
-            NameLabel.Text = Company.GetName();
+            NameLabel.Text = Company.Name;
             // Update the size label
             SizeLabel.Text = size;
             // Update the shares label

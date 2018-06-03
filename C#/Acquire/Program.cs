@@ -16,13 +16,13 @@ namespace Acquire
             Application.SetCompatibleTextRenderingDefault(false);
 
             // Create a new setup frame to get the players list
-            AcquireSetupFrame asfFrame = new AcquireSetupFrame();
-            Application.Run(asfFrame);
+            AcquireSetupFrame frame = new AcquireSetupFrame();
+            Application.Run(frame);
 
             // If we have players and we're supposed to start, start the game
-            if (asfFrame.IsStarting && asfFrame.Players.Count > 1)
+            if (frame.IsStarting && frame.Players.Count > 1)
             {
-                Application.Run(new AcquireFrame(asfFrame.Players));
+                Application.Run(new AcquireFrame(frame.Players));
             }
         }
     }

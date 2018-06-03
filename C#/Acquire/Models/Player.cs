@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Acquire.Components;
 using Acquire.Enums;
 using Acquire.Models.Interfaces;
@@ -84,7 +85,7 @@ namespace Acquire.Models
             // Initialize all of the companies
             foreach (Company company in Game.Companies)
             {
-                string companyName = company.GetName().ToLowerInvariant();
+                string companyName = company.Name.ToLowerInvariant();
                 isMajorityHolder[companyName] = false;
                 isMinorityHolder[companyName] = false;
                 shares[companyName] = 0;
@@ -118,11 +119,11 @@ namespace Acquire.Models
 
                         if (!openingShare)
                         {
-                            LogMaster.DynamicLog(Name + " bought " + LogMaster.DynamicContent(Name + company.GetName() + "Buy", LogMaster.STANDARD_NUPROG, 1, "Buy") + " " + LogMaster.DynamicContent(Name + company.GetName() + "Shares", LogMaster.SHARES, 1, LogMaster.SHARES_TYPE) + " of " + company.GetName() + ".");
+                            LogMaster.DynamicLog(Name + " bought " + LogMaster.DynamicContent(Name + company.Name + "Buy", LogMaster.STANDARD_NUPROG, 1, "Buy") + " " + LogMaster.DynamicContent(Name + company.Name + "Shares", LogMaster.SHARES, 1, LogMaster.SHARES_TYPE) + " of " + company.Name + ".");
                         }
                         else
                         {
-                            LogMaster.Log(Name + " was given one free share of " + company.GetName());
+                            LogMaster.Log(Name + " was given one free share of " + company.Name);
                         }
 
                         // Update the company's holders with this player
@@ -164,16 +165,16 @@ namespace Acquire.Models
                     // Give the pPlayer their money
                     Money += company.SellShare(companySize);
 
-                    string dynamicSold = LogMaster.DynamicContent(Name + company.GetName() + "Sold", LogMaster.STANDARD_NUPROG, 1, "Sold");
-                    string dynamicShares = LogMaster.DynamicContent(Name + company.GetName() + "Shares", LogMaster.SHARES, 1, LogMaster.SHARES_TYPE);
-                    LogMaster.DynamicLog($"{Name} sold {dynamicSold} {dynamicShares} of {company.GetName()}.");
+                    string dynamicSold = LogMaster.DynamicContent(Name + company.Name + "Sold", LogMaster.STANDARD_NUPROG, 1, "Sold");
+                    string dynamicShares = LogMaster.DynamicContent(Name + company.Name + "Shares", LogMaster.SHARES, 1, LogMaster.SHARES_TYPE);
+                    LogMaster.DynamicLog($"{Name} sold {dynamicSold} {dynamicShares} of {company.Name}.");
 
                     // Subtract one share from the pPlayer
                     SetShares(company, GetShares(company) - 1);
                 }
                 else
                 {
-                    LogMaster.Log($"You don't have any shares of {company.GetName()} to sell.");
+                    LogMaster.Log($"You don't have any shares of {company.Name} to sell.");
                 }
             }
             else
@@ -210,7 +211,7 @@ namespace Acquire.Models
             // If there are enough shares in the live company to trade all the shares
             if (GetShares(deadCompany) / 2 > liveCompany.Shares)
             {
-                LogMaster.Log($"{Name} traded {numShares * 2} shares of {deadCompany.GetName()} for {numShares} shares of {liveCompany.GetName()}");
+                LogMaster.Log($"{Name} traded {numShares * 2} shares of {deadCompany.Name} for {numShares} shares of {liveCompany.Name}");
 
                 // Trade the shares
                 SetShares(liveCompany, GetShares(liveCompany) + numShares);
@@ -223,7 +224,7 @@ namespace Acquire.Models
             // Otherwise...
             else
             {
-                LogMaster.Log($"{Name} traded {GetShares(deadCompany)} shares of {deadCompany.GetName()} for {GetShares(deadCompany) / 2} shares of {liveCompany.GetName()}");
+                LogMaster.Log($"{Name} traded {GetShares(deadCompany)} shares of {deadCompany.Name} for {GetShares(deadCompany) / 2} shares of {liveCompany.Name}");
 
                 int sharesTraded = GetShares(deadCompany);
 
@@ -257,7 +258,7 @@ namespace Acquire.Models
 
             foreach (Company company in Game.Companies)
             {
-                Console.WriteLine($@"{company.GetName()}: {GetShares(company)}");
+                Console.WriteLine($@"{company.Name}: {GetShares(company)}");
             }
         }
 
@@ -266,13 +267,7 @@ namespace Acquire.Models
         /// </summary>
         public void RemoveDeadSquares()
         {
-            for (int i = 0; i < Squares.Count; i++)
-            {
-                if (Squares[i].GetState() == Square.STATE_DEAD)
-                {
-                    Squares.RemoveAt(i);
-                }
-            }
+            Squares.RemoveAll(s => s.State == SquareState.Dead);
         }
 
         #endregion
@@ -291,7 +286,7 @@ namespace Acquire.Models
         /// </summary>
         /// 
         /// <returns>The amount of shares the player has in the <paramref name="company"/></returns>
-        public int GetShares(Company company) => GetShares(company.GetName());
+        public int GetShares(Company company) => GetShares(company.Name);
 
         #endregion
 
@@ -316,7 +311,7 @@ namespace Acquire.Models
         /// <param name="numShares">The amount of shares to be stored for the given company</param>
         public void SetShares(Company company, int numShares)
         {
-            SetShares(company.GetName(), numShares);
+            SetShares(company.Name, numShares);
         }
 
         /// <summary>
@@ -338,7 +333,7 @@ namespace Acquire.Models
         /// <param name="isPlayerMajorityHolder">Whether or not this player is a majority holder</param>
         public void SetMajorityHolder(Company company, bool isPlayerMajorityHolder)
         {
-            SetMajorityHolder(company.GetName(), isPlayerMajorityHolder);
+            SetMajorityHolder(company.Name, isPlayerMajorityHolder);
         }
 
         /// <summary>
@@ -360,7 +355,7 @@ namespace Acquire.Models
         /// <param name="isPlayerMinorityHolder">Whether or not this player is a minority holder</param>
         public void SetMinorityHolder(Company company, bool isPlayerMinorityHolder)
         {
-            SetMinorityHolder(company.GetName(), isPlayerMinorityHolder);
+            SetMinorityHolder(company.Name, isPlayerMinorityHolder);
         }
 
         #endregion
@@ -375,8 +370,10 @@ namespace Acquire.Models
         /// 
         public bool CanPlaceSquare()
         {
-            if (canPlaceSquare && Squares.Count == 0)
+            if (canPlaceSquare && !Squares.Any())
+            {
                 canPlaceSquare = false;
+            }
 
             return canPlaceSquare;
         }
@@ -416,7 +413,7 @@ namespace Acquire.Models
         /// <param name="company">The company for which we are finding if this player is a majority holder</param>
         /// 
         /// <returns>Whether or not the pPlayer is a majority holder of the company <paramref name="company"/></returns>
-        public bool IsMajorityHolder(Company company) => IsMajorityHolder(company.GetName());
+        public bool IsMajorityHolder(Company company) => IsMajorityHolder(company.Name);
 
         /// <summary>
         /// Returns whether or not the pPlayer is a minority holder of the company named <paramref name="companyName"/>
@@ -434,7 +431,7 @@ namespace Acquire.Models
         /// <param name="company">The company for which we are finding if this player is a majority holder</param>
         /// 
         /// <returns>Whether or not the pPlayer is a minority holder of the company <paramref name="company"/></returns>
-        public bool IsMinorityHolder(Company company) => IsMinorityHolder(company.GetName());
+        public bool IsMinorityHolder(Company company) => IsMinorityHolder(company.Name);
 
         #endregion
     }

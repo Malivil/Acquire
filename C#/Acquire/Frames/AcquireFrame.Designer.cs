@@ -106,7 +106,7 @@ namespace Acquire.Frames
             this.QuitMenuItem.Name = "QuitMenuItem";
             this.QuitMenuItem.Size = new System.Drawing.Size(164, 22);
             this.QuitMenuItem.Text = "Quit";
-            this.QuitMenuItem.Click += new System.EventHandler(this.QuitMenuIteClick);
+            this.QuitMenuItem.Click += new System.EventHandler(this.QuitMenuItem_Click);
             // 
             // HelpMenu
             // 
@@ -122,7 +122,7 @@ namespace Acquire.Frames
             this.HelpToolItem.Name = "HelpToolItem";
             this.HelpToolItem.Size = new System.Drawing.Size(107, 22);
             this.HelpToolItem.Text = "Help";
-            this.HelpToolItem.Click += new System.EventHandler(this.HelpToolIteClick);
+            this.HelpToolItem.Click += new System.EventHandler(this.HelpToolItem_Click);
             // 
             // AboutMenuItem
             // 
@@ -130,7 +130,7 @@ namespace Acquire.Frames
             this.AboutMenuItem.ShortcutKeyDisplayString = "";
             this.AboutMenuItem.Size = new System.Drawing.Size(107, 22);
             this.AboutMenuItem.Text = "About";
-            this.AboutMenuItem.Click += new System.EventHandler(this.AboutMenuIteClick);
+            this.AboutMenuItem.Click += new System.EventHandler(this.AboutMenuItem_Click);
             // 
             // LogBox
             // 

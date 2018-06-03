@@ -42,13 +42,13 @@ namespace Acquire.Models
         /// </summary>
         public static List<Company> Companies = new List<Company>
         {
-            new Company("Tower", 5, 0, Image.FromFile(@"Images/tow_icon.GIF", true)),
-            new Company("Luxor", 4, 0, Image.FromFile(@"Images/lux_icon.GIF", true)),
-            new Company("American", 8, 2, Image.FromFile(@"Images/amer_icon.GIF", true)),
-            new Company("Festival", 6, 1, Image.FromFile(@"Images/fest_icon.GIF", true)),
-            new Company("Worldwide", 7, 1, Image.FromFile(@"Images/wor_icon.GIF", true)),
-            new Company("Continental", 9, 2, Image.FromFile(@"Images/cont_icon.GIF", true)),
-            new Company("Imperial", 10, 2, Image.FromFile(@"Images/imp_icon.GIF", true))
+            new Company("Tower", 5, 0, Image.FromFile(@"Images/tow_icon.GIF", true), Color.FromArgb(255, 254, 206, 18)),
+            new Company("Luxor", 4, 0, Image.FromFile(@"Images/lux_icon.GIF", true), Color.FromArgb(255, 227, 43, 79)),
+            new Company("American", 8, 2, Image.FromFile(@"Images/amer_icon.GIF", true), Color.FromArgb(255, 13, 39, 123)),
+            new Company("Festival", 6, 1, Image.FromFile(@"Images/fest_icon.GIF", true), Color.FromArgb(255, 4, 180, 76)),
+            new Company("Worldwide", 7, 1, Image.FromFile(@"Images/wor_icon.GIF", true), Color.FromArgb(255, 142, 97, 40)),
+            new Company("Continental", 9, 2, Image.FromFile(@"Images/cont_icon.GIF", true), Color.FromArgb(255, 20, 164, 204)),
+            new Company("Imperial", 10, 2, Image.FromFile(@"Images/imp_icon.GIF", true), Color.FromArgb(255, 220, 28, 116))
         };
 
         #endregion
@@ -124,7 +124,7 @@ namespace Acquire.Models
                 // If the company is safe, let it know
                 if (company.Size > 10)
                 {
-                    company.IsSafe(true);
+                    company.IsSafe = true;
                     safeCompanies++;
                 }
 

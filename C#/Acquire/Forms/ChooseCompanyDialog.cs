@@ -45,7 +45,7 @@ namespace Acquire.Forms
             // Add each company to the list
             foreach (Company coCompany in companies)
             {
-                CompanyBox.Items.Add(coCompany.GetName());
+                CompanyBox.Items.Add(coCompany.Name);
             }
 
             // Make sure the first one is selected by default
@@ -73,11 +73,12 @@ namespace Acquire.Forms
         /// <param name="args">The arguments sent</param>
         private void OKButton_Click(object sender, EventArgs args)
         {
-            for (int i = 0; i < companies.Count && ChosenCompany == null; i++)
+            foreach (Company company in companies)
             {
-                if (companies[i].GetName().Equals(CompanyBox.Items[CompanyBox.SelectedIndex]))
+                if (company.Name.Equals(CompanyBox.Items[CompanyBox.SelectedIndex]))
                 {
-                    ChosenCompany = companies[i];
+                    ChosenCompany = company;
+                    break;
                 }
             }
 

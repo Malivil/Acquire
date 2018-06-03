@@ -54,6 +54,7 @@
   <ItemGroup>
     <Compile Include="Enums\MessageType.cs" />
     <Compile Include="Enums\PlayerType.cs" />
+    <Compile Include="Enums\SquareState.cs" />
     <Compile Include="Forms\RemoteConnectForm.cs">
       <SubType>Form</SubType>
     </Compile>

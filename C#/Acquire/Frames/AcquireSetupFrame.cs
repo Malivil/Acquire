@@ -84,10 +84,10 @@ namespace Acquire.Frames
             List<IPlayer> players = GetPlayers();
 
             // Only continue if we have at least one player
-            if (players.Count > 1)
+            if (players.Any())
             {
                 // Make sure the user knows that there are only AI players
-                if (players.Count(p => p.Type == PlayerType.AI) == players.Count)
+                if (players.All(p => p.Type == PlayerType.AI))
                 {
                     if (MessageBox.Show(@"There are no human players, is this ok?", @"No human players?", MessageBoxButtons.YesNo, MessageBoxIcon.Error) != DialogResult.Yes)
                     {
@@ -441,7 +441,7 @@ namespace Acquire.Frames
                 }
                 else
                 {
-                    players.Add((Player)player);
+                    players.Add(player as Player);
                 }
             }
 

@@ -8,15 +8,8 @@ namespace Acquire.Models
     {
         #region Private Member Variables
 
-        // Name of the company
-        private readonly string name;
-
-        // The company ID
-        private readonly int id;
-
         // The quality of the company
         private readonly int quality;
-
         // Whether the company is safe
         private bool isSafe;
 
@@ -29,9 +22,37 @@ namespace Acquire.Models
         #region Public Variables
 
         /// <summary>
+        /// Name of the company
+        /// </summary>
+        public string Name { get; }
+
+        /// <summary>
+        /// The company ID
+        /// </summary>
+        private int Id { get; }
+
+        /// <summary>
         /// Whether the company has been placed
         /// </summary>
         public bool IsPlaced { get; set; }
+
+        /// <summary>
+        /// Whether the company is safe
+        /// </summary>
+        public bool IsSafe
+        {
+            get => isSafe;
+            set
+            {
+                // Only log this company as being safe if it is just being turned safe
+                if (value && !isSafe)
+                {
+                    LogMaster.Log($"{Name} is now safe.");
+                }
+
+                isSafe = value;
+            }
+        }
 
         /// <summary>
         /// The company's icon
@@ -48,6 +69,11 @@ namespace Acquire.Models
         /// </summary>
         public int Shares { get; set; } = 30;
 
+        /// <summary>
+        /// The square color that represents this company
+        /// </summary>
+        public Color Color { get; }
+
         #endregion
 
         /// <summary>
@@ -59,11 +85,14 @@ namespace Acquire.Models
         /// <param name="id">The ID # of this company</param>
         /// <param name="quality">The quality of this company</param>
         /// <param name="imageIcon">The icon to associate with this company</param>
-        public Company(string name, int id, int quality, Image imageIcon)
+        /// <param name="companyColor">The square color that represents this company</param>
+        public Company(string name, int id, int quality, Image imageIcon, Color companyColor)
         {
-            this.name = name;
-            this.id = id;
             this.quality = quality;
+            Name = name;
+            Id = id;
+            Color = companyColor;
+
             ImageIcon = imageIcon;
             majorityHolders = new List<Player>();
             minorityHolders = new List<Player>();
@@ -165,8 +194,8 @@ namespace Acquire.Models
             // Set the majority and minority holder status for every pPlayer to false
             foreach (Player player in majorityAndMinorityHolders)
             {
-                player.SetMajorityHolder(name, false);
-                player.SetMinorityHolder(name, false);
+                player.SetMajorityHolder(Name, false);
+                player.SetMinorityHolder(Name, false);
             }
 
             // Clear the current majority and minority holders
@@ -177,16 +206,16 @@ namespace Acquire.Models
             foreach (Player player in majorityAndMinorityHolders)
             {
                 // Set the current majority to the lead holder if we have one
-                int currentMajShares = majorityHolders.Count != 0 ? majorityHolders[0].GetShares(name) : 0;
+                int currentMajShares = majorityHolders.Count != 0 ? majorityHolders[0].GetShares(Name) : 0;
 
                 // Set the current majority to the lead holder if we have one
-                int currentMinShares = minorityHolders.Count != 0 ? minorityHolders[0].GetShares(name) : 0;
+                int currentMinShares = minorityHolders.Count != 0 ? minorityHolders[0].GetShares(Name) : 0;
 
                 // If the pPlayer qualifies for a majority share...
-                if (player.GetShares(name) >= currentMajShares)
+                if (player.GetShares(Name) >= currentMajShares)
                 {
                     // If the pPlayer beats out the current leader
-                    if (player.GetShares(name) > currentMajShares)
+                    if (player.GetShares(Name) > currentMajShares)
                     {
                         // Reset both lists
                         minorityHolders.Clear();
@@ -202,10 +231,10 @@ namespace Acquire.Models
                     }
                 }
                 // If the pPlayer qualifies for a minority share
-                else if (player.GetShares(name) >= currentMinShares && player.GetShares(name) < currentMajShares)
+                else if (player.GetShares(Name) >= currentMinShares && player.GetShares(Name) < currentMajShares)
                 {
                     // If the pPlayer beats out the current minority leader, clear the minority leaders
-                    if (player.GetShares(name) > currentMinShares)
+                    if (player.GetShares(Name) > currentMinShares)
                     {
                         minorityHolders.Clear();
                     }
@@ -227,22 +256,22 @@ namespace Acquire.Models
             // Make sure each majority leader knows they are one
             foreach (Player player in majorityHolders)
             {
-                player.SetMajorityHolder(name, true);
+                player.SetMajorityHolder(Name, true);
 
                 if (logChanges && !oldMajorityHolders.Contains(player))
                 {
-                    LogMaster.Log(player.Name + " is now a majority leader of " + name + ".");
+                    LogMaster.Log(player.Name + " is now a majority leader of " + Name + ".");
                 }
             }
 
             // Make sure each minority leader knows they are one
             foreach (Player player in minorityHolders)
             {
-                player.SetMinorityHolder(name, true);
+                player.SetMinorityHolder(Name, true);
 
                 if (logChanges && !oldMinorityHolders.Contains(player))
                 {
-                    LogMaster.Log(player.Name + " is now a minority leader of " + name + ".");
+                    LogMaster.Log(player.Name + " is now a minority leader of " + Name + ".");
                 }
             }
         }
@@ -307,95 +336,6 @@ namespace Acquire.Models
 
             return price;
         }
-
-        /// <summary>
-        /// Returns the ID number of this company
-        /// </summary>
-        /// 
-        /// <returns>The ID number of this company</returns>
-        public int GetId() => id;
-
-        /// <summary>
-        /// Returns the company's name.
-        /// </summary>
-        /// 
-        /// <returns>The company's name.</returns>
-        public string GetName() => name;
-
-        /// <summary>
-        /// Returns a string representing the company's current status.
-        /// </summary>
-        /// 
-        /// <returns>A string representing the company's current status.</returns>
-        public string GetInfo()
-            => $@"{name} - ID: {id}
-Shares: {Shares}
-Price per share: {GetPrice()}
-Majority Holder: {majorityHolders}
-Minority Holder: {minorityHolders}";
-
-        /// <summary>
-        /// Returns a string list of the company's current majority holders.
-        /// </summary>
-        /// 
-        /// <returns>A string list of the company's current majority holders.</returns>
-        public string GetMajorityHolders()
-        {
-            string output = "";
-            int position = 0;
-            for (; position < majorityHolders.Count - 1; position++)
-            {
-                output += $"{majorityHolders[position].Name}, ";
-            }
-            output += majorityHolders[position].Name;
-
-            return output;
-        }
-
-        /// <summary>
-        /// Returns a string list of the company's current minority holders.
-        /// </summary>
-        /// 
-        /// <returns>A string list of the company's current minority holders.</returns>
-        public string GetMinorityHolders()
-        {
-            string output = "";
-            int position = 0;
-            for (; position < minorityHolders.Count - 1; position++)
-            {
-                output += $"{minorityHolders[position].Name}, ";
-            }
-            output += minorityHolders[position].Name;
-
-            return output;
-        }
-
-        #endregion
-
-        #region Boolean Methods
-
-        /// <summary>
-        /// Sets whether or not this company is safe.
-        /// </summary>
-        /// 
-        /// <param name="isSafe">Whether or not this company is safe.</param>
-        public void IsSafe(bool isSafe)
-        {
-            // Only log this company as being safe if it is just being turned safe
-            if (isSafe && this.isSafe != true)
-            {
-                LogMaster.Log($"{GetName()} is now safe.");
-            }
-
-            this.isSafe = isSafe;
-        }
-
-        /// <summary>
-        /// Returns whether or not this company is safe.
-        /// </summary>
-        ///
-        /// <returns>Whether or not this company is safe.</returns>
-        public bool IsSafe() => isSafe;
 
         #endregion
     }

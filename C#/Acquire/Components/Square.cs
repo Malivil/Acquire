@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
+using Acquire.Enums;
 using Acquire.Models;
 using Acquire.Panels;
 
@@ -9,22 +10,6 @@ namespace Acquire.Components
 {
     public partial class Square : UserControl
     {
-        #region Public Fields
-
-        // Not placed, never placeable
-        public const int STATE_DEAD = 0;
-
-        // Not placed, not placeable right now
-        public const int STATE_OPEN = 1;
-
-        // Not placed, placeable
-        public const int STATE_OPTION = 2;
-
-        // Placed
-        public const int STATE_PLACED = 3;
-
-        #endregion
-
         #region Public Member Variables
 
         /// <summary>
@@ -39,6 +24,16 @@ namespace Acquire.Components
         /// Whether or not this square can been placed
         /// </summary>
         public bool CanBePlaced { get; set; } = true;
+
+        /// <summary>
+        /// The state this square is in
+        /// </summary>
+        public SquareState State { get; private set; }
+
+        /// <summary>
+        /// The company associated with this square
+        /// </summary>
+        public Company Company { get; private set; }
 
         /// <summary>
         /// The square to the left
@@ -73,17 +68,11 @@ namespace Acquire.Components
         // This square's ID
         private readonly string id;
 
-        // The state this square is in
-        private int state;
-
-        // The company associated with this square
-        private Company company;
-
         #endregion
 
         /// <summary>
         /// Creates a new Square with ID id
-        /// Initializes the square to STATE_OPEN
+        /// Initializes the square to SquareState.Open
         /// </summary>
         /// 
         /// <param name="id">The ID to assign this Square</param>
@@ -92,7 +81,7 @@ namespace Acquire.Components
             InitializeComponent();
 
             this.id = id;
-            SetState(STATE_OPEN);
+            SetState(SquareState.Open);
         }
 
         #region Event Handlers
@@ -154,33 +143,33 @@ namespace Acquire.Components
             List<Company> liSurroundingComps = new List<Company>();
 
             // If the left square is a safe company, add it to the list
-            if (LeftSquare?.GetCompany()?.IsSafe() == true)
+            if (LeftSquare?.Company?.IsSafe == true)
             {
-                liSurroundingComps.Add(LeftSquare.GetCompany());
+                liSurroundingComps.Add(LeftSquare.Company);
             }
 
             // If the right square is a safe company and it isn't in the list already, add it to the list
-            if (RightSquare?.GetCompany()?.IsSafe() == true && !liSurroundingComps.Contains(RightSquare.GetCompany()))
+            if (RightSquare?.Company?.IsSafe == true && !liSurroundingComps.Contains(RightSquare.Company))
             {
-                liSurroundingComps.Add(RightSquare.GetCompany());
+                liSurroundingComps.Add(RightSquare.Company);
             }
 
             // If the top square is a safe company and it isn't in the list already, add it to the list
-            if (TopSquare?.GetCompany()?.IsSafe() == true && !liSurroundingComps.Contains(TopSquare.GetCompany()))
+            if (TopSquare?.Company?.IsSafe == true && !liSurroundingComps.Contains(TopSquare.Company))
             {
-                liSurroundingComps.Add(TopSquare.GetCompany());
+                liSurroundingComps.Add(TopSquare.Company);
             }
 
             // If the bottom square is a safe company and it isn't in the list already, add it to the list
-            if (BottomSquare?.GetCompany()?.IsSafe() == true && !liSurroundingComps.Contains(BottomSquare.GetCompany()))
+            if (BottomSquare?.Company?.IsSafe == true && !liSurroundingComps.Contains(BottomSquare.Company))
             {
-                liSurroundingComps.Add(BottomSquare.GetCompany());
+                liSurroundingComps.Add(BottomSquare.Company);
             }
 
             // If there are at least two safe companies around this square, it is never placeable
             if (liSurroundingComps.Count >= 2)
             {
-                SetState(STATE_DEAD);
+                SetState(SquareState.Dead);
             }
         }
 
@@ -204,7 +193,7 @@ namespace Acquire.Components
                         if (CanBePlaced)
                         {
                             // Try to place a square
-                            if (GridPanel.PlaceSquare(this) != null)
+                            if (GridPanel.PlaceSquare(this))
                             {
                                 // If it worked, stop the player from placing more squares
                                 Game.CurrentPlayer.CanPlaceSquare(false);
@@ -262,24 +251,6 @@ namespace Acquire.Components
 
         #endregion
 
-        #region Get Methods
-
-        /// <summary>
-        /// Returns this square's current state
-        /// </summary>
-        /// 
-        /// <returns>This square's current state</returns>
-        public int GetState() => state;
-
-        /// <summary>
-        /// Returns the company associated with this square
-        /// </summary>
-        /// 
-        /// <returns>The company associated with this square</returns>
-        public Company GetCompany() => company;
-
-        #endregion
-
         #region Set Methods
 
         /// <summary>
@@ -287,69 +258,34 @@ namespace Acquire.Components
         /// </summary>
         /// 
         /// <param name="state">The state to set this square to</param>
-        public void SetState(int state)
+        public void SetState(SquareState state)
         {
-            this.state = state;
+            State = state;
 
             switch (state)
             {
-                case STATE_DEAD: // Can never be placed
+                case SquareState.Dead:
                     BackColor = Color.White;
                     CanBePlaced = false;
                     IsPlaced = true;
                     IsCompany = false;
                     break;
-                case STATE_OPEN: // Blank
+                case SquareState.Open:
                     BackColor = Color.DarkGray;
                     IsPlaced = false;
                     IsCompany = false;
                     CanBePlaced = true;
                     break;
-                case STATE_OPTION: // Option
+                case SquareState.Placeable:
                     BackColor = Color.Gray;
                     IsCompany = false;
                     IsPlaced = false;
                     CanBePlaced = true;
                     break;
-                case STATE_PLACED: // Placed
+                case SquareState.Placed:
                     BackColor = Color.Black;
                     IsCompany = false;
                     IsPlaced = true;
-                    break;
-                case 4: // Luxor
-                    BackColor = Color.FromArgb(255, 227, 43, 79);
-                    IsCompany = true;
-                    IsPlaced = false;
-                    break;
-                case 5: // Tower
-                    BackColor = Color.FromArgb(255, 254, 206, 18);
-                    IsCompany = true;
-                    IsPlaced = false;
-                    break;
-                case 6: // Festival
-                    BackColor = Color.FromArgb(255, 4, 180, 76);
-                    IsCompany = true;
-                    IsPlaced = false;
-                    break;
-                case 7: // Worldwide
-                    BackColor = Color.FromArgb(255, 142, 97, 40);
-                    IsCompany = true;
-                    IsPlaced = false;
-                    break;
-                case 8: // American
-                    BackColor = Color.FromArgb(255, 13, 39, 123);
-                    IsCompany = true;
-                    IsPlaced = false;
-                    break;
-                case 9: // Continental
-                    BackColor = Color.FromArgb(255, 20, 164, 204);
-                    IsCompany = true;
-                    IsPlaced = false;
-                    break;
-                case 10: // Imperial
-                    BackColor = Color.FromArgb(255, 220, 28, 116);
-                    IsCompany = true;
-                    IsPlaced = false;
                     break;
             }
         }
@@ -361,8 +297,10 @@ namespace Acquire.Components
         /// <param name="company">The company to associate with this Square</param>
         public void SetCompany(Company company)
         {
-            this.company = company;
-            SetState(company.GetId());
+            Company = company;
+            BackColor = company.Color;
+            IsCompany = true;
+            IsPlaced = false;
         }
 
         #endregion

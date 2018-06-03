@@ -49,7 +49,7 @@ namespace Acquire.Forms
             this.player = player;
 
             // Update the label
-            SharesLabel.Text = $@"{player.Name}, you have {shares} shares of {deadCompany.GetName()}.";
+            SharesLabel.Text = $@"{player.Name}, you have {shares} shares of {deadCompany.Name}.";
 
             // Add all the trade possibilities
             for (int i = 0; i <= shares; i += 2)
@@ -209,16 +209,17 @@ namespace Acquire.Forms
             {
                 totalShares += SellBox.SelectedIndex;
             }
-            if (TradeBox.SelectedIndex * 2 > 0)
+            if (TradeBox.SelectedIndex > 0)
             {
                 totalShares += TradeBox.SelectedIndex * 2;
             }
 
             bool shouldContinue = true;
+            int remainingShares = shares - totalShares;
             // If this isn't all of the shares, make sure that the user knows.
-            if (totalShares < shares)
+            if (remainingShares > 0)
             {
-                shouldContinue = MessageBox.Show($@"You still have {shares - totalShares} shares left.\nWould you like to just keep them?", @"Keep remaining shares?", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes;
+                shouldContinue = MessageBox.Show($@"You still have {remainingShares} shares left.\nWould you like to just keep them?", @"Keep remaining shares?", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes;
             }
 
             // If the user said yes (or it doesn't matter)
