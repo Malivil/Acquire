@@ -129,9 +129,6 @@ namespace Acquire.Panels
                 IsHostBox.Checked = false;
                 IsHostBox.Checked = true;
             }
-
-            // TODO: Only allow 1 remote player. Rename to "Remote Host" in dropdown. Force IsHost to be checked when selecting it
-            // TODO: If the local player is the host, don't allow any remote players to be added this way
         }
 
         /// <summary>
