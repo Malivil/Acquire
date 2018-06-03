@@ -298,6 +298,7 @@ namespace Acquire.Components
         public void SetCompany(Company company)
         {
             Company = company;
+            State = (SquareState)company.Id;
             BackColor = company.Color;
             IsCompany = true;
             IsPlaced = false;

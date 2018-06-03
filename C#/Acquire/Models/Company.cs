@@ -29,7 +29,7 @@ namespace Acquire.Models
         /// <summary>
         /// The company ID
         /// </summary>
-        private int Id { get; }
+        public int Id { get; }
 
         /// <summary>
         /// Whether the company has been placed

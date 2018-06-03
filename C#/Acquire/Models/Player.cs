@@ -163,11 +163,12 @@ namespace Acquire.Models
                 if (GetShares(company) > 0)
                 {
                     // Give the pPlayer their money
-                    Money += company.SellShare(companySize);
+                    int sellPrice = company.SellShare(companySize);
+                    Money += sellPrice;
 
                     string dynamicSold = LogMaster.DynamicContent(Name + company.Name + "Sold", LogMaster.STANDARD_NUPROG, 1, "Sold");
                     string dynamicShares = LogMaster.DynamicContent(Name + company.Name + "Shares", LogMaster.SHARES, 1, LogMaster.SHARES_TYPE);
-                    LogMaster.DynamicLog($"{Name} sold {dynamicSold} {dynamicShares} of {company.Name}.");
+                    LogMaster.DynamicLog($"{Name} sold {dynamicSold} {dynamicShares} of {company.Name} for {sellPrice:C0}.");
 
                     // Subtract one share from the pPlayer
                     SetShares(company, GetShares(company) - 1);
