@@ -122,12 +122,11 @@ namespace Acquire.Panels
                     break;
             }
 
-            // Toggle the check mark to refresh the state of the host player in the setup frame
+            // Trigger the event to refresh the state of the host player in the setup frame
             // This fixes switching between Local and Remote not updating the status of things like the "Begin Listening" button
             if (IsHostBox.Checked)
             {
-                IsHostBox.Checked = false;
-                IsHostBox.Checked = true;
+                IsHostBox_CheckedChanged(null, EventArgs.Empty);
             }
         }
 

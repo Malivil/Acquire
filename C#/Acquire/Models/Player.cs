@@ -30,7 +30,7 @@ namespace Acquire.Models
         /// <summary>
         /// This player's name
         /// </summary>
-        public string Name { get; }
+        public string Name { get; set; }
 
         /// <summary>
         /// This player's Unique ID

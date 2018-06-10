@@ -12,9 +12,6 @@ using TcpClient = SocketMessaging.TcpClient;
 
 namespace Acquire.Forms
 {
-    /// <summary>
-    /// TODO: Comment this whole class
-    /// </summary>
     public partial class RemoteConnectForm : Form
     {
         #region Public Variables
@@ -39,6 +36,12 @@ namespace Acquire.Forms
 
         #endregion
 
+        /// <summary>
+        /// Creates an instance of the form used to initiate the connection to a remote server
+        /// </summary>
+        ///
+        /// <param name="endpoint">The remove endpoint to connect to</param>
+        /// <param name="players">The list of players loaded into this local game instance</param>
         public RemoteConnectForm(IPEndPoint endpoint, IEnumerable<IPlayer> players)
         {
             remoteEndpoint = endpoint;
@@ -48,6 +51,9 @@ namespace Acquire.Forms
             InitiateConnection();
         }
 
+        /// <summary>
+        /// Opens the connection to the server and begins listening for events
+        /// </summary>
         private void InitiateConnection()
         {
             AddRemoteStatusMessage($"Connecting to {remoteEndpoint.Address}:{remoteEndpoint.Port}...");
@@ -64,6 +70,11 @@ namespace Acquire.Forms
             }
         }
 
+        /// <summary>
+        /// Gets the <see cref="TcpClient"/> instance used by this connection form
+        /// </summary>
+        ///
+        /// <returns>The client instance used by this connection form</returns>
         public TcpClient GetClient()
         {
             if (DialogResult != DialogResult.OK)
@@ -76,6 +87,12 @@ namespace Acquire.Forms
 
         #region Event Handlers
 
+        /// <summary>
+        /// Handles receving messages from the remote server
+        /// </summary>
+        ///
+        /// <param name="sender">Event sender - Unused</param>
+        /// <param name="e">Event arguments - Unused</param>
         private void Client_ReceivedMessage(object sender, EventArgs e)
         {
             NetworkMessage message = Utilities.GetMessageFromConnection<NetworkMessage>(client);
@@ -103,11 +120,23 @@ namespace Acquire.Forms
             }
         }
 
+        /// <summary>
+        /// Handles disconnection events
+        /// </summary>
+        ///
+        /// <param name="sender">Event sender - Unused</param>
+        /// <param name="e">Event arguments - Unused</param>
         private void Client_Disconnected(object sender, EventArgs e)
         {
             AddRemoteStatusMessage($"Lost connection from {remoteEndpoint.Address}:{remoteEndpoint.Port}");
         }
 
+        /// <summary>
+        /// Handles canceling the connection
+        /// </summary>
+        ///
+        /// <param name="sender">Event sender - Unused</param>
+        /// <param name="e">Event arguments - Unused</param>
         private void CancelConnectButton_Click(object sender, EventArgs e)
         {
             client?.Close();
@@ -117,6 +146,9 @@ namespace Acquire.Forms
 
         #region Helpers
 
+        /// <summary>
+        /// Prepares the client for starting the game with remote connections
+        /// </summary>
         private void StartGame()
         {
             AddRemoteStatusMessage("Starting game...");
@@ -128,6 +160,9 @@ namespace Acquire.Forms
             Close();
         }
 
+        /// <summary>
+        /// Handles a received connect messaeg and sends a player list to the remote server
+        /// </summary>
         private void HandleConnectMessage()
         {
             AddRemoteStatusMessage("Connected!");
@@ -139,6 +174,11 @@ namespace Acquire.Forms
             SendMessage(MessageType.PlayerListResponse, playersMessage);
         }
 
+        /// <summary>
+        /// Handles receiving the remote player list
+        /// </summary>
+        ///
+        /// <param name="message">The message containing player data</param>
         private void HandlePlayersListMessage(NetworkMessage message)
         {
             AddRemoteStatusMessage("Received list of players");
@@ -157,16 +197,43 @@ namespace Acquire.Forms
             Players = players.Players;
         }
 
-        private void HandlePlayerRename(PlayerRename player)
+        /// <summary>
+        /// Handles renaming each player based on the recommendation from the server
+        /// </summary>
+        ///
+        /// <param name="renames">Object containing list of player rename actions to be taken</param>
+        private void HandlePlayerRename(PlayerRename renames)
         {
-            // TODO:
+            foreach (PlayerRenameItem rename in renames.PlayerRenames)
+            {
+                Player foundPlayer = localPlayers.FirstOrDefault(p => p.PlayerId == rename.PlayerId);
+                if (foundPlayer == null)
+                {
+                    AddRemoteStatusMessage($"No player with ID = {rename.PlayerId}, Name = {rename.OriginalName} found in local list");
+                    continue;
+                }
+
+                AddRemoteStatusMessage($"Renaming {rename.OriginalName} to {rename.NewName} due to duplicate on remote server");
+                foundPlayer.Name = rename.NewName;
+            }
         }
 
+        /// <summary>
+        /// Sends the given <paramref name="data"/> as a message of the specified <paramref name="type"/>
+        /// </summary>
+        ///
+        /// <param name="type">The type of message being sent</param>
+        /// <param name="data">The data to send within the message</param>
         private void SendMessage(MessageType type, AcquireNetworkModel data = null)
         {
             Utilities.SendMessageToConnection(client, data, type);
         }
 
+        /// <summary>
+        /// Adds the given <paramref name="message"/> to the <see cref="RemoteStatusBox"/> on the UI
+        /// </summary>
+        ///
+        /// <param name="message">The message to display</param>
         private void AddRemoteStatusMessage(string message)
         {
             Utilities.InvokeOnControl(RemoteStatusBox, () => RemoteStatusBox.Items.Add(message));
