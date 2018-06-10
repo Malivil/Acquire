@@ -163,9 +163,11 @@ namespace Acquire.Frames
         /// <returns>True if the panel successfully claimed or released hosting rights, false otherwise</returns>
         private bool PlayerSetupPanel_PlayerHostStatusChanged(PlayerSetupPanel sender, bool isHost)
         {
+            // Don't allow another player to try to be host but if the same player
+            // calls this event again, just let them pass through
             if (HasHost && isHost)
             {
-                return false;
+                return hostPlayer.PlayerId == sender.PlayerId;
             }
 
             if (isHost)
