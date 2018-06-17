@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Acquire.Components;
 using Acquire.Enums;
@@ -27,39 +26,25 @@ namespace Acquire.Models
 
         #region Public Member Variables
 
-        /// <summary>
-        /// This player's name
-        /// </summary>
+        /// <inheritdoc />
         public string Name { get; set; }
 
-        /// <summary>
-        /// This player's Unique ID
-        /// </summary>
+        /// <inheritdoc />
         public string PlayerId { get; }
 
-        /// <summary>
-        /// The type of player this is
-        /// </summary>
+        /// <inheritdoc />
         public PlayerType Type { get; }
 
-        /// <summary>
-        /// Whether this player is the host of the game
-        /// </summary>
+        /// <inheritdoc />
         public bool IsHost { get; }
 
-        /// <summary>
-        /// The amount of money this player has
-        /// </summary>
+        /// <inheritdoc />
         public int Money { get; private set; } = 6000;
 
-        /// <summary>
-        /// The number of buys this player has left in this turn
-        /// </summary>
+        /// <inheritdoc />
         public int NumBuysLeft { get; set; } = 3;
 
-        /// <summary>
-        /// List of all the squares this player has
-        /// </summary>
+        /// <inheritdoc />
         public List<Square> Squares { get; set; } = new List<Square>();
 
         #endregion
@@ -94,12 +79,7 @@ namespace Acquire.Models
 
         #region Action Methods
 
-        /// <summary>
-        /// Buys one share of the given company
-        /// </summary>
-        /// 
-        /// <param name="company">The company from which to buy a share</param>
-        /// <param name="openingShare">Whether or not the share being bought is an opening share</param>
+        /// <inheritdoc />
         public void BuyShare(Company company, bool openingShare)
         {
             // Can only buy a share if we've placed a square or its the opening share
@@ -154,7 +134,7 @@ namespace Acquire.Models
         /// <param name="company">The company from which to sell a single share</param>
         /// <param name="isMerging">Whether or not this company is merging with another one</param>
         /// <param name="companySize">The size of the company at the time of selling</param>
-        public void SellShare(Company company, bool isMerging, int companySize)
+        private void SellShare(Company company, bool isMerging, int companySize)
         {
             // Can only sell a share if a square has been placed or a company is merging
             if (!canPlaceSquare || isMerging)
@@ -184,14 +164,7 @@ namespace Acquire.Models
             }
         }
 
-        /// <summary>
-        /// Sells multiple shares of the given company
-        /// </summary>
-        ///
-        /// <param name="company">The company from which to sell <paramref name="numShares"/> shares</param>
-        /// <param name="numShares">The number of shares being sold</param>
-        /// <param name="isMerging">Whether or not this company is merging with another one</param>
-        ///
+        /// <inheritdoc />
         public void SellShares(Company company, int numShares, bool isMerging)
         {
             for (int i = 0; i < numShares; i++)
@@ -200,13 +173,7 @@ namespace Acquire.Models
             }
         }
 
-        /// <summary>
-        /// Trades the amount of shares of <paramref name="deadCompany"/> given by <paramref name="numShares"/> to shares of <paramref name="liveCompany"/>
-        /// </summary>
-        /// 
-        /// <param name="deadCompany">The company being destroyed whose shares are being traded</param>
-        /// <param name="liveCompany">The company to which the old shares are being traded</param>
-        /// <param name="numShares">The amount of shares to be traded</param>
+        /// <inheritdoc />
         public void TradeShares(Company deadCompany, Company liveCompany, int numShares)
         {
             // If there are enough shares in the live company to trade all the shares
@@ -239,33 +206,13 @@ namespace Acquire.Models
             }
         }
 
-        /// <summary>
-        /// Gives the amount designated by <paramref name="money"/> to the player
-        /// </summary>
-        /// 
-        /// <param name="money">The amount of money to give the player</param>
+        /// <inheritdoc />
         public void GiveMoney(int money)
         {
             Money += money;
         }
 
-        /// <summary>
-        /// Prints out the status of this company to the console
-        /// </summary>
-        public void PrintStatus()
-        {
-            Console.WriteLine($@"Name: {Name} money: ${Money}");
-            Console.WriteLine(@"Number of shares in each company:");
-
-            foreach (Company company in Game.Companies)
-            {
-                Console.WriteLine($@"{company.Name}: {GetShares(company)}");
-            }
-        }
-
-        /// <summary>
-        /// Removes all unusable squares from the player's hand
-        /// </summary>
+        /// <inheritdoc />
         public void RemoveDeadSquares()
         {
             Squares.RemoveAll(s => s.State == SquareState.Dead);
@@ -275,100 +222,39 @@ namespace Acquire.Models
 
         #region Get Methods
 
-        /// <summary>
-        /// Returns the amount of shares the player has in the company named <paramref name="companyName"/>
-        /// </summary>
-        /// 
-        /// <returns>The amount of shares the player has in the company named <paramref name="companyName"/></returns>
+        /// <inheritdoc />
         public int GetShares(string companyName) => shares[companyName.ToLower()];
 
-        /// <summary>
-        /// Returns the amount of shares the player has in the <paramref name="company"/>
-        /// </summary>
-        /// 
-        /// <returns>The amount of shares the player has in the <paramref name="company"/></returns>
+        /// <inheritdoc />
         public int GetShares(Company company) => GetShares(company.Name);
 
         #endregion
 
         #region Set Methods
 
-        /// <summary>
-        /// Sets the amount of shares this player has in the company named <paramref name="companyName"/> to <paramref name="numShares"/>
-        /// </summary>
-        /// 
-        /// <param name="companyName">The name of the company whose shares we are updating</param>
-        /// <param name="numShares">The amount of shares to be stored for the given company</param>
-        public void SetShares(string companyName, int numShares)
-        {
-            shares[companyName.ToLower()] = numShares;
-        }
-
-        /// <summary>
-        /// Sets the amount of shares this player has in the company <paramref name="company"/> to <paramref name="numShares"/>
-        /// </summary>
-        /// 
-        /// <param name="company">The company whose shares we are updating</param>
-        /// <param name="numShares">The amount of shares to be stored for the given company</param>
+        /// <inheritdoc />
         public void SetShares(Company company, int numShares)
         {
-            SetShares(company.Name, numShares);
+            shares[company.Name.ToLower()] = numShares;
         }
 
-        /// <summary>
-        /// Sets whether or not this player is a majority holder for the company named <paramref name="companyName"/>
-        /// </summary>
-        /// 
-        /// <param name="companyName">The name of the company for whom we are updating majority holder status</param>
-        /// <param name="isPlayerMajorityHolder">Whether or not this player is a majority holder</param>
+        /// <inheritdoc />
         public void SetMajorityHolder(string companyName, bool isPlayerMajorityHolder)
         {
             isMajorityHolder[companyName.ToLower()] = isPlayerMajorityHolder;
         }
 
-        /// <summary>
-        /// Sets whether or not this player is a majority holder for the company <paramref name="company"/>
-        /// </summary>
-        /// 
-        /// <param name="company">The company for whom we are updating majority holder status</param>
-        /// <param name="isPlayerMajorityHolder">Whether or not this player is a majority holder</param>
-        public void SetMajorityHolder(Company company, bool isPlayerMajorityHolder)
-        {
-            SetMajorityHolder(company.Name, isPlayerMajorityHolder);
-        }
-
-        /// <summary>
-        /// Sets whether or not this player is a minority holder for the company named <paramref name="companyName"/>
-        /// </summary>
-        /// 
-        /// <param name="companyName">The name of the company for whom we are updating minority holder status</param>
-        /// <param name="isPlayerMinorityHolder">Whether or not this player is a minority holder</param>
+        /// <inheritdoc />
         public void SetMinorityHolder(string companyName, bool isPlayerMinorityHolder)
         {
             isMinorityHolder[companyName.ToLower()] = isPlayerMinorityHolder;
-        }
-
-        /// <summary>
-        /// Sets whether or not this player is a minority holder for the company <paramref name="company"/>
-        /// </summary>
-        /// 
-        /// <param name="company">The company for whom we are updating minority holder status</param>
-        /// <param name="isPlayerMinorityHolder">Whether or not this player is a minority holder</param>
-        public void SetMinorityHolder(Company company, bool isPlayerMinorityHolder)
-        {
-            SetMinorityHolder(company.Name, isPlayerMinorityHolder);
         }
 
         #endregion
 
         #region Boolean Methods
 
-        /// <summary>
-        /// Returns whether or not the pPlayer can place a square
-        /// </summary>
-        /// 
-        /// <returns>Whether or not the pPlayer can place a square</returns>
-        /// 
+        /// <inheritdoc />
         public bool CanPlaceSquare()
         {
             if (canPlaceSquare && !Squares.Any())
@@ -379,60 +265,20 @@ namespace Acquire.Models
             return canPlaceSquare;
         }
 
-        /// <summary>
-        /// Sets whether or not the player can place a square to <paramref name="canPlayerPlaceSquare"/>
-        /// </summary>
-        /// 
-        /// <param name="canPlayerPlaceSquare">Whether or not the player can place a square</param>
+        /// <inheritdoc />
         public void CanPlaceSquare(bool canPlayerPlaceSquare)
         {
             canPlaceSquare = canPlayerPlaceSquare;
         }
 
-        /// <summary>
-        /// Returns whether or not this player has the given <paramref name="square"/>
-        /// </summary>
-        /// 
-        /// <param name="square">The square being searched for</param>
-        /// 
-        /// <returns>Whether or not this player has the given square</returns>
+        /// <inheritdoc />
         public bool HasSquare(Square square) => Squares.Contains(square);
 
-        /// <summary>
-        /// Returns whether or not the pPlayer is a majority holder of the company named <paramref name="companyName"/>
-        /// </summary>
-        /// 
-        /// <param name="companyName">The name of the company for which we are finding if this player is a majority holder</param>
-        /// 
-        /// <returns>Whether or not the pPlayer is a majority holder of the company named <paramref name="companyName"/></returns>
-        public bool IsMajorityHolder(string companyName) => isMajorityHolder[companyName.ToLower()];
+        /// <inheritdoc />
+        public bool IsMajorityHolder(Company company) => isMajorityHolder[company.Name.ToLower()];
 
-        /// <summary>
-        /// Returns whether or not the pPlayer is a majority holder of the company <paramref name="company"/>
-        /// </summary>
-        /// 
-        /// <param name="company">The company for which we are finding if this player is a majority holder</param>
-        /// 
-        /// <returns>Whether or not the pPlayer is a majority holder of the company <paramref name="company"/></returns>
-        public bool IsMajorityHolder(Company company) => IsMajorityHolder(company.Name);
-
-        /// <summary>
-        /// Returns whether or not the pPlayer is a minority holder of the company named <paramref name="companyName"/>
-        /// </summary>
-        /// 
-        /// <param name="companyName">The name of the company for which we are finding if this player is a minority holder</param>
-        /// 
-        /// <returns>Whether or not the pPlayer is a minority holder of the company named <paramref name="companyName"/></returns>
-        public bool IsMinorityHolder(string companyName) => isMinorityHolder[companyName.ToLower()];
-
-        /// <summary>
-        /// Returns whether or not the pPlayer is a minority holder of the company <paramref name="company"/>
-        /// </summary>
-        /// 
-        /// <param name="company">The company for which we are finding if this player is a majority holder</param>
-        /// 
-        /// <returns>Whether or not the pPlayer is a minority holder of the company <paramref name="company"/></returns>
-        public bool IsMinorityHolder(Company company) => IsMinorityHolder(company.Name);
+        /// <inheritdoc />
+        public bool IsMinorityHolder(Company company) => isMinorityHolder[company.Name.ToLower()];
 
         #endregion
     }

@@ -56,15 +56,6 @@ namespace Acquire.Models.Interfaces
         void BuyShare(Company company, bool openingShare);
 
         /// <summary>
-        /// Sells a single share of the given company
-        /// </summary>
-        /// 
-        /// <param name="company">The company from which to sell a single share</param>
-        /// <param name="isMerging">Whether or not this company is merging with another one</param>
-        /// <param name="companySize">The size of the company at the time of selling</param>
-        void SellShare(Company company, bool isMerging, int companySize);
-
-        /// <summary>
         /// Sells multiple shares of the given company
         /// </summary>
         ///
@@ -89,11 +80,6 @@ namespace Acquire.Models.Interfaces
         /// 
         /// <param name="money">The amount of money to give the player</param>
         void GiveMoney(int money);
-
-        /// <summary>
-        /// Prints out the status of this company to the console
-        /// </summary>
-        void PrintStatus();
 
         /// <summary>
         /// Removes all unusable squares from the player's hand
@@ -123,14 +109,6 @@ namespace Acquire.Models.Interfaces
         #region Set Methods
 
         /// <summary>
-        /// Sets the amount of shares this player has in the company named <paramref name="companyName"/> to <paramref name="numShares"/>
-        /// </summary>
-        /// 
-        /// <param name="companyName">The name of the company whose shares we are updating</param>
-        /// <param name="numShares">The amount of shares to be stored for the given company</param>
-        void SetShares(string companyName, int numShares);
-
-        /// <summary>
         /// Sets the amount of shares this player has in the company <paramref name="company"/> to <paramref name="numShares"/>
         /// </summary>
         /// 
@@ -147,28 +125,12 @@ namespace Acquire.Models.Interfaces
         void SetMajorityHolder(string companyName, bool isPlayerMajorityHolder);
 
         /// <summary>
-        /// Sets whether or not this player is a majority holder for the company <paramref name="company"/>
-        /// </summary>
-        /// 
-        /// <param name="company">The company for whom we are updating majority holder status</param>
-        /// <param name="isPlayerMajorityHolder">Whether or not this player is a majority holder</param>
-        void SetMajorityHolder(Company company, bool isPlayerMajorityHolder);
-
-        /// <summary>
         /// Sets whether or not this player is a minority holder for the company named <paramref name="companyName"/>
         /// </summary>
         /// 
         /// <param name="companyName">The name of the company for whom we are updating minority holder status</param>
         /// <param name="isPlayerMinorityHolder">Whether or not this player is a minority holder</param>
         void SetMinorityHolder(string companyName, bool isPlayerMinorityHolder);
-
-        /// <summary>
-        /// Sets whether or not this player is a minority holder for the company <paramref name="company"/>
-        /// </summary>
-        /// 
-        /// <param name="company">The company for whom we are updating minority holder status</param>
-        /// <param name="isPlayerMinorityHolder">Whether or not this player is a minority holder</param>
-        void SetMinorityHolder(Company company, bool isPlayerMinorityHolder);
 
         #endregion
 
@@ -199,15 +161,6 @@ namespace Acquire.Models.Interfaces
         bool HasSquare(Square square);
 
         /// <summary>
-        /// Returns whether or not the pPlayer is a majority holder of the company named <paramref name="companyName"/>
-        /// </summary>
-        /// 
-        /// <param name="companyName">The name of the company for which we are finding if this player is a majority holder</param>
-        /// 
-        /// <returns>Whether or not the pPlayer is a majority holder of the company named <paramref name="companyName"/></returns>
-        bool IsMajorityHolder(string companyName);
-
-        /// <summary>
         /// Returns whether or not the pPlayer is a majority holder of the company <paramref name="company"/>
         /// </summary>
         /// 
@@ -215,15 +168,6 @@ namespace Acquire.Models.Interfaces
         /// 
         /// <returns>Whether or not the pPlayer is a majority holder of the company <paramref name="company"/></returns>
         bool IsMajorityHolder(Company company);
-
-        /// <summary>
-        /// Returns whether or not the pPlayer is a minority holder of the company named <paramref name="companyName"/>
-        /// </summary>
-        /// 
-        /// <param name="companyName">The name of the company for which we are finding if this player is a minority holder</param>
-        /// 
-        /// <returns>Whether or not the pPlayer is a minority holder of the company named <paramref name="companyName"/></returns>
-        bool IsMinorityHolder(string companyName);
 
         /// <summary>
         /// Returns whether or not the pPlayer is a minority holder of the company <paramref name="company"/>
