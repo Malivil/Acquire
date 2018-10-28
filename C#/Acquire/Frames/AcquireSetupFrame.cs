@@ -176,6 +176,7 @@ namespace Acquire.Frames
             // calls this event again, just let them pass through
             if (HasHost && isHost)
             {
+                UpdateServerButtonState();
                 return hostPlayer.PlayerId == sender.PlayerId;
             }
 
@@ -188,19 +189,7 @@ namespace Acquire.Frames
                 hostPlayer = null;
             }
 
-            // If this isn't a local host and we have an open server, close it
-            if (!IsHostLocal && CloseServerButton.Enabled)
-            {
-                CloseServerButton.PerformClick();
-                OpenServerButton.Visible = false;
-                OpenServerButton.Enabled = false;
-            }
-            else
-            {
-                OpenServerButton.Visible = true;
-                OpenServerButton.Enabled = true;
-            }
-
+            UpdateServerButtonState();
             return true;
         }
 
@@ -584,6 +573,28 @@ namespace Acquire.Frames
         {
             PlayerSetupPanel panel = Controls.OfType<PlayerSetupPanel>().FirstOrDefault(p => p.PlayerId == playerId);
             method(panel);
+        }
+
+        /// <summary>
+        /// Updates the state of the server button, closing the dialog if the state changes while it is open
+        /// </summary>
+        private void UpdateServerButtonState()
+        {
+            // If this isn't a local host, update the server button and window status
+            if (!IsHostLocal)
+            {
+                if (CloseServerButton.Enabled)
+                {
+                    CloseServerButton.PerformClick();
+                }
+                OpenServerButton.Visible = false;
+                OpenServerButton.Enabled = false;
+            }
+            else
+            {
+                OpenServerButton.Visible = true;
+                OpenServerButton.Enabled = true;
+            }
         }
 
         #endregion
