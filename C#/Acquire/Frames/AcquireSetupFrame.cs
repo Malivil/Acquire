@@ -383,7 +383,6 @@ namespace Acquire.Frames
             MaximumSize = originalSize;
             OpenServerButton.Visible = true;
             OpenServerButton.Enabled = true;
-            // TODO: When #13 is implemented (Fake PSPs in ASF to represent remote players), this will need to be adjusted so they stay disabled
             ExecuteAgainstPlayers(p => { p.SetJoinEnabled(true); });
 
             // Stop listening

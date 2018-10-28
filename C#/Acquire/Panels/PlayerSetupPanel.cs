@@ -162,6 +162,7 @@ namespace Acquire.Panels
             NameLabel.Enabled = IsReady();
             IPLabel.Enabled = IsReady();
             TypeLabel.Enabled = IsReady();
+            JoinBox.Enabled = IsReady();
 
             // If this is an AI
             if (GetPlayerType() == PlayerType.AI)
@@ -299,7 +300,17 @@ namespace Acquire.Panels
         /// <param name="status">The enabled state to set the join checkbox to</param>
         public void SetJoinEnabled(bool status)
         {
-            Utilities.InvokeOnControl(JoinBox, () => JoinBox.Enabled = status);
+            Utilities.InvokeOnControl(JoinBox, () =>
+            {
+                // Don't change the state of the Join box is the player is already "ready"
+                if (IsReady())
+                {
+                    return;
+                }
+
+                // TODO: When #13 is implemented (Fake PSPs in ASF to represent remote players), this will need to be adjusted so they stay disabled
+                JoinBox.Enabled = status;
+            });
         }
 
         /// <summary>
