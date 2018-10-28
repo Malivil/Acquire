@@ -57,6 +57,7 @@ namespace Acquire.Forms
             localPlayers = new List<Player>(players.Cast<Player>());
 
             InitializeComponent();
+            Utilities.AddCopyCapability(RemoteStatusBox);
             InitiateConnection();
         }
 

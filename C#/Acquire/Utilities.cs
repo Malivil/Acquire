@@ -191,6 +191,22 @@ namespace Acquire
             }
         }
 
+        public static void AddCopyCapability(Control control)
+        {
+            if (!(control is ListBox listBox))
+            {
+                return;
+            }
+
+            listBox.KeyDown += (sender, args) =>
+            {
+                if (args.Control && args.KeyCode == Keys.C)
+                {
+                    Clipboard.SetData(DataFormats.StringFormat, listBox.SelectedItem.ToString());
+                }
+            };
+        }
+
         #endregion
 
         #region Players

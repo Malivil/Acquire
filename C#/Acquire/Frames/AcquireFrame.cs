@@ -27,6 +27,7 @@ namespace Acquire.Frames
         public AcquireFrame(List<IPlayer> players)
         {
             InitializeComponent();
+            Utilities.AddCopyCapability(LogBox);
 
             // Set up the LogMaster to use this text box
             LogMaster.SetListBox(LogBox);

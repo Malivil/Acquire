@@ -63,6 +63,7 @@ namespace Acquire.Frames
         public AcquireSetupFrame()
         {
             InitializeComponent();
+            Utilities.AddCopyCapability(RemoteStatusBox);
             originalSize = Size;
         }
 
