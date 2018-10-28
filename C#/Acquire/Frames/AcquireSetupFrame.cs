@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Drawing;
-using System.Linq;
-using System.Net;
-using System.Windows.Forms;
-using Acquire.Enums;
+﻿using Acquire.Enums;
 using Acquire.Forms;
 using Acquire.Models;
 using Acquire.Models.Interfaces;
@@ -13,6 +6,13 @@ using Acquire.NetworkModels;
 using Acquire.Panels;
 using SocketMessaging;
 using SocketMessaging.Server;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Drawing;
+using System.Linq;
+using System.Net;
+using System.Windows.Forms;
 
 namespace Acquire.Frames
 {
@@ -213,6 +213,7 @@ namespace Acquire.Frames
             Size = MaximumSize;
             MinimumSize = MaximumSize;
             OpenServerButton.Enabled = false;
+            ExecuteAgainstPlayers(p => { p.EnableJoin(false); });
 
             // Begin listening
             IPEndPoint endpoint = hostPlayer.GetAddressEndPoint();
@@ -384,6 +385,8 @@ namespace Acquire.Frames
             MaximumSize = originalSize;
             OpenServerButton.Visible = true;
             OpenServerButton.Enabled = true;
+            // TODO: When #13 is implemented (Fake PSPs in ASF to represent remote players), this will need to be adjusted so they stay disabled
+            ExecuteAgainstPlayers(p => { p.EnableJoin(true); });
 
             // Stop listening
             if (hostServer != null)
@@ -492,20 +495,17 @@ namespace Acquire.Frames
         /// <returns>True if there were not errors, false if there were</returns>
         private bool LoadPlayersList()
         {
-            // Create a list of the PSPs to make it easier and quicker to run the same code on each
-            IEnumerable<PlayerSetupPanel> setupPanels = Controls.OfType<PlayerSetupPanel>();
             // Clear the current list of players
             Players.Clear();
             // The list of current player names (to eliminate duplicates)
             List<string> playerNames = new List<string>();
 
-            // For each panel...
-            foreach (PlayerSetupPanel panel in setupPanels)
+            return ExecuteAgainstPlayers(panel =>
             {
                 // If we are not joining, continue
                 if (!panel.IsJoining())
                 {
-                    continue;
+                    return true;
                 }
 
                 // Check if the player is ready
@@ -532,9 +532,36 @@ namespace Acquire.Frames
 
                 // Create the player of the correct type
                 Players.Add(panel.GetPlayer(name));
-            }
 
-            return true;
+                return true;
+            });
+        }
+
+        /// <summary>
+        /// Executes the given <paramref name="method"/> against all of the <see cref="PlayerSetupPanel"/> objects in this frame.
+        /// </summary>
+        ///
+        /// <param name="method">The method to execute</param>
+        private void ExecuteAgainstPlayers(Action<PlayerSetupPanel> method)
+        {
+            ExecuteAgainstPlayers(p =>
+            {
+                method(p);
+                return true;
+            });
+        }
+
+        /// <summary>
+        /// Executes the given <paramref name="method"/> against all of the <see cref="PlayerSetupPanel"/> objects in this frame.
+        /// </summary>
+        ///
+        /// <param name="method">The method to execute</param>
+        ///
+        /// <returns>True if all calls to the <paramref name="method"/> return true, false otherwise</returns>
+        private bool ExecuteAgainstPlayers(Func<PlayerSetupPanel, bool> method)
+        {
+            IEnumerable<PlayerSetupPanel> setupPanels = Controls.OfType<PlayerSetupPanel>();
+            return setupPanels.Aggregate(true, (current, panel) => current && method(panel));
         }
 
         #endregion

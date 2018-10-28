@@ -302,5 +302,20 @@ namespace Acquire.Panels
         public bool IsHost() => IsHostBox.Checked;
 
         #endregion
+
+        #region Control Methods
+
+        /// <summary>
+        /// Sets the enabled state of the join checkbox to the given <paramref name="status"/>
+        ///
+        /// </summary>
+        ///
+        /// <param name="status">The enabled state to set the join checkbox to</param>
+        public void EnableJoin(bool status)
+        {
+            JoinBox.Enabled = status;
+        }
+
+        #endregion
     }
 }
