@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using Acquire.Enums;
 using Acquire.NetworkModels;
@@ -207,11 +208,19 @@ namespace Acquire
         /// <returns>A unique form of the given <paramref name="name"/> based on the list of <paramref name="otherNames"/> provided.</returns>
         public static string GetUniqueName(string name, List<string> otherNames)
         {
-            string newName = name.Clone().ToString();
+            // Trim any existing numbers off the end of the name
+            string originalName = name.Clone().ToString();
+            Regex regex = new Regex("\\w* \\(\\d\\)+");
+            if (regex.IsMatch(originalName))
+            {
+                originalName = originalName.Substring(0, originalName.LastIndexOf('(') - 1);
+            }
+            string newName = originalName.Clone().ToString();
+
             // Find a number to add to the end to make it unique
             for (int i = 2; otherNames.Contains(newName, StringComparer.OrdinalIgnoreCase); i++)
             {
-                newName = $"{name} ({i})";
+                newName = $"{originalName} ({i})";
             }
 
             return newName;
