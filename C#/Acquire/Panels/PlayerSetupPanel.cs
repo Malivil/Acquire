@@ -17,12 +17,19 @@ namespace Acquire.Panels
 
         #endregion
 
-        #region Public Member Variables
+        #region Public Variables
 
         /// <summary>
         /// This player's Unique ID
         /// </summary>
         public string PlayerId = Guid.NewGuid().ToString("N");
+
+        #endregion
+
+        #region Private Member Variables
+
+        // What this player's original name was when "ready" was clicked
+        private string originalName;
 
         #endregion
 
@@ -119,6 +126,7 @@ namespace Acquire.Panels
                     NameBox.Visible = false;
                     IsHostBox.Enabled = IsHostBox.Visible = IsHostBox.Checked = false;
                     IPBox.Visible = IPBox.Enabled = IPLabel.Visible = false;
+                    NameBox.Text = string.Empty;
                     break;
             }
 
@@ -217,6 +225,12 @@ namespace Acquire.Panels
         /// <returns>The name of this player.</returns>
         public string GetName()
         {
+            // Check if a name has been set before generating one
+            if (!string.IsNullOrWhiteSpace(NameBox.Text))
+            {
+                return NameBox.Text;
+            }
+
             // AI Player
             if (GetPlayerType() == PlayerType.AI)
             {
@@ -225,11 +239,6 @@ namespace Acquire.Panels
                 return AINameBox.Items[aiIndex].ToString();
             }
 
-            // Local or Remote Player
-            if (!string.IsNullOrWhiteSpace(NameBox.Text))
-            {
-                return NameBox.Text;
-            }
             return GetPlayerType() == PlayerType.Local ? "Player" : REMOTE_PLAYER;
         }
 
@@ -263,17 +272,63 @@ namespace Acquire.Panels
         /// <returns>A new <see cref="Player"/>-derived object for the player represented by this panel</returns>
         public Player GetPlayer(string nameOverride = null)
         {
+            SetName(nameOverride);
+
             if (GetPlayerType() == PlayerType.Local)
             {
-                return new Player(nameOverride ?? GetName(), PlayerType.Local, PlayerId, IsHost());
+                return new Player(GetName(), PlayerType.Local, PlayerId, IsHost());
             }
 
             if (GetPlayerType() == PlayerType.AI)
             {
-                return new AiPlayer(nameOverride ?? GetName(), PlayerId);
+                return new AiPlayer(GetName(), PlayerId);
             }
 
             return new RemotePlayer(PlayerId, GetAddress(), IsHost());
+        }
+
+        #endregion
+
+        #region Set Methods
+
+        /// <summary>
+        /// Sets the enabled state of the join checkbox to the given <paramref name="status"/>
+        ///
+        /// </summary>
+        ///
+        /// <param name="status">The enabled state to set the join checkbox to</param>
+        public void SetJoinEnabled(bool status)
+        {
+            Utilities.InvokeOnControl(JoinBox, () => JoinBox.Enabled = status);
+        }
+
+        /// <summary>
+        /// Sets the player's name to the given <paramref name="name"/> value
+        /// </summary>
+        ///
+        /// <param name="name">The name to give to this player</param>
+        public void SetName(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(originalName))
+            {
+                originalName = NameBox.Text;
+            }
+
+            // Update the name value on its thread
+            Utilities.InvokeOnControl(NameBox, () => NameBox.Text = name);
+        }
+
+        /// <summary>
+        /// Sets the player's name back to its original value
+        /// </summary>
+        public void ResetName()
+        {
+            SetName(originalName);
         }
 
         #endregion
@@ -300,21 +355,6 @@ namespace Acquire.Panels
         ///
         /// <returns>Whether or not the player represented by this panel is the host</returns>
         public bool IsHost() => IsHostBox.Checked;
-
-        #endregion
-
-        #region Control Methods
-
-        /// <summary>
-        /// Sets the enabled state of the join checkbox to the given <paramref name="status"/>
-        ///
-        /// </summary>
-        ///
-        /// <param name="status">The enabled state to set the join checkbox to</param>
-        public void EnableJoin(bool status)
-        {
-            JoinBox.Enabled = status;
-        }
 
         #endregion
     }

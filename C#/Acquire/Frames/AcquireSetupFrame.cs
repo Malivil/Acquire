@@ -84,42 +84,51 @@ namespace Acquire.Frames
             List<IPlayer> players = GetPlayers();
 
             // Only continue if we have at least one player
-            if (players.Any())
+            if (!players.Any())
             {
-                // Make sure the user knows that there are only AI players
-                if (players.All(p => p.Type == PlayerType.AI))
-                {
-                    if (MessageBox.Show(@"There are no human players, is this ok?", @"No human players?", MessageBoxButtons.YesNo, MessageBoxIcon.Error) != DialogResult.Yes)
-                    {
-                        return;
-                    }
-                }
+                MessageBox.Show(@"There are not enough players to start the game.", @"Not enough players", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
 
-                // Make sure we have a host if we have remote players
-                if (players.Any(p => p.Type == PlayerType.Remote) && !HasHost)
+            // Make sure the user knows that there are only AI players
+            if (players.All(p => p.Type == PlayerType.AI))
+            {
+                if (MessageBox.Show(@"There are no human players, is this ok?", @"No human players?", MessageBoxButtons.YesNo, MessageBoxIcon.Error) != DialogResult.Yes)
                 {
-                    MessageBox.Show(@"There are remote players listed but no host selected. Please select a host", @"No host selected", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+            }
+
+            // TODO: Remove this logic as a part of #4 (Adjust handling of "Remote Players")
+            // Make sure we have a host if we have remote players
+            if (players.Any(p => p.Type == PlayerType.Remote) && !HasHost)
+            {
+                MessageBox.Show(@"There are remote players listed but no host selected. Please select a host", @"No host selected", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            // If there is a remote host, initiate the connection
+            if (players.SingleOrDefault(p => p.Type == PlayerType.Remote && p.IsHost) is IRemotePlayer remoteHost)
+            {
+                RemoteConnectForm dialog = new RemoteConnectForm(remoteHost.Endpoint, players);
+                // Handle player renames
+                dialog.PlayerNameChanged += (id, name) => { ExecuteAgainstPlayer(p => { p?.SetName(name); }, id); };
+
+                DialogResult result = dialog.ShowDialog();
+                // Don't start the game if the prcoess didn't complete successfully
+                if (result != DialogResult.OK)
+                {
+                    // Reset all the player names back to their originals
+                    ExecuteAgainstPlayers(p => p.ResetName());
                     return;
                 }
 
-                // If there is a remote host, initiate the connection
-                if (players.SingleOrDefault(p => p.Type == PlayerType.Remote && p.IsHost) is IRemotePlayer remoteHost)
-                {
-                    DialogResult result = new RemoteConnectForm(remoteHost.Endpoint, players).ShowDialog();
-                    // Don't start the game if the prcoess didn't complete successfully
-                    if (result != DialogResult.OK)
-                    {
-                        return;
-                    }
-                }
+                // TODO: Do something with the dialog's list of players?
+                //players = dialog.Players;
+            }
 
-                IsStarting = true;
-                Close();
-            }
-            else
-            {
-                MessageBox.Show(@"There are not enough players to start the game.", @"Not enough players", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            IsStarting = true;
+            Close();
         }
 
         /// <summary>
@@ -213,7 +222,7 @@ namespace Acquire.Frames
             Size = MaximumSize;
             MinimumSize = MaximumSize;
             OpenServerButton.Enabled = false;
-            ExecuteAgainstPlayers(p => { p.EnableJoin(false); });
+            ExecuteAgainstPlayers(p => { p.SetJoinEnabled(false); });
 
             // Begin listening
             IPEndPoint endpoint = hostPlayer.GetAddressEndPoint();
@@ -386,7 +395,7 @@ namespace Acquire.Frames
             OpenServerButton.Visible = true;
             OpenServerButton.Enabled = true;
             // TODO: When #13 is implemented (Fake PSPs in ASF to represent remote players), this will need to be adjusted so they stay disabled
-            ExecuteAgainstPlayers(p => { p.EnableJoin(true); });
+            ExecuteAgainstPlayers(p => { p.SetJoinEnabled(true); });
 
             // Stop listening
             if (hostServer != null)
@@ -560,8 +569,21 @@ namespace Acquire.Frames
         /// <returns>True if all calls to the <paramref name="method"/> return true, false otherwise</returns>
         private bool ExecuteAgainstPlayers(Func<PlayerSetupPanel, bool> method)
         {
-            IEnumerable<PlayerSetupPanel> setupPanels = Controls.OfType<PlayerSetupPanel>();
+            // Order the panels by name so the order that they show up in the frame corresponds to the order they are processed in
+            IEnumerable<PlayerSetupPanel> setupPanels = Controls.OfType<PlayerSetupPanel>().OrderBy(p => p.Name);
             return setupPanels.Aggregate(true, (current, panel) => current && method(panel));
+        }
+
+        /// <summary>
+        /// Executes the given <paramref name="method"/> against the <see cref="PlayerSetupPanel"/> that has the provided <paramref name="playerId"/>.
+        /// </summary>
+        ///
+        /// <param name="method">The method to execute</param>
+        /// <param name="playerId">The unique identifier for the player panel to execute the <paramref name="method"/> against</param>
+        private void ExecuteAgainstPlayer(Action<PlayerSetupPanel> method, string playerId)
+        {
+            PlayerSetupPanel panel = Controls.OfType<PlayerSetupPanel>().FirstOrDefault(p => p.PlayerId == playerId);
+            method(panel);
         }
 
         #endregion

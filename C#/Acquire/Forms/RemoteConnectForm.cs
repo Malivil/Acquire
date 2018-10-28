@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Net;
 using System.Windows.Forms;
@@ -19,7 +20,15 @@ namespace Acquire.Forms
         /// <summary>
         /// The list of players for the fully connected game
         /// </summary>
-        public List<Player> Players { get; private set; }
+        public List<IPlayer> Players { get; private set; }
+
+        #endregion
+
+        #region Events
+
+        public delegate void OnPlayerNameChanged(string playerId, string newName);
+        [Browsable(true)]
+        public event OnPlayerNameChanged PlayerNameChanged;
 
         #endregion
 
@@ -194,7 +203,7 @@ namespace Acquire.Forms
             AddRemoteStatusMessage($"Ai players: {players.AICount}");
 
             // Save the list of players to use for the game when we start
-            Players = players.Players;
+            Players = players.Players.ToList<IPlayer>();
         }
 
         /// <summary>
@@ -215,6 +224,7 @@ namespace Acquire.Forms
 
                 AddRemoteStatusMessage($"Renaming {rename.OriginalName} to {rename.NewName} due to duplicate on remote server");
                 foundPlayer.Name = rename.NewName;
+                PlayerNameChanged?.Invoke(rename.PlayerId, rename.NewName);
             }
         }
 
