@@ -390,6 +390,7 @@ namespace Acquire.Frames
             if (hostServer != null)
             {
                 hostServer.Connected -= Server_Connected;
+                hostServer.Stop();
                 RemoteStatusBox.Items.Add("Stopped listening for new connections");
             }
         }
