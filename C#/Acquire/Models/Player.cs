@@ -171,6 +171,7 @@ namespace Acquire.Models
             {
                 SellShare(company, isMerging, company.Size);
             }
+            Game.UpdatePlayerList();
         }
 
         /// <inheritdoc />
