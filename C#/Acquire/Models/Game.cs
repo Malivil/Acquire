@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using Acquire.Components;
 using Acquire.Enums;
 using Acquire.Frames;
 using Acquire.Models.Interfaces;
@@ -28,11 +29,6 @@ namespace Acquire.Models
         public static List<IPlayer> Players { get; private set; }
 
         /// <summary>
-        /// The active <see cref="AcquireFrame"/>
-        /// </summary>
-        public static AcquireFrame OwnerFrame { get; private set; }
-
-        /// <summary>
         /// Whether or not this game is over
         /// </summary>
         public static bool IsGameOver { get; private set; }
@@ -52,6 +48,11 @@ namespace Acquire.Models
         };
 
         #endregion
+
+        /// <summary>
+        /// The active <see cref="AcquireFrame"/>
+        /// </summary>
+        private static AcquireFrame OwnerFrame { get; set; }
 
         #region Action Methods
 
@@ -85,7 +86,7 @@ namespace Acquire.Models
             // If this is an AI player, get them started
             if (CurrentPlayer.Type == PlayerType.AI)
             {
-                ((AiPlayer)CurrentPlayer).TakeTurn();
+                ((IAIPlayer)CurrentPlayer).TakeTurn();
             }
         }
 
@@ -201,6 +202,7 @@ namespace Acquire.Models
                 {
                     highest = player;
                 }
+
                 if (player.Money < lowest.Money)
                 {
                     lowest = player;
@@ -255,14 +257,14 @@ namespace Acquire.Models
             // Reset the end turn button
             EndTurnCheck();
             // Clear the current dynamic content
-            LogMaster.ClearDynamicContent(true, true);
+            LogMaster.ClearDynamicContent();
             // Tell the users whose turn it is
             LogMaster.Log("It is now " + CurrentPlayer.Name + "'s turn.");
 
             // If this is an AI player, make them take their turn
             if (CurrentPlayer.Type == PlayerType.AI)
             {
-                ((AiPlayer)CurrentPlayer).TakeTurn();
+                ((IAIPlayer)CurrentPlayer).TakeTurn();
             }
         }
 
@@ -299,6 +301,44 @@ namespace Acquire.Models
         ///
         /// <returns>True if a company has been placed, false otherwise</returns>
         public static bool HasActiveCompanies() => Companies.Any(c => c.IsPlaced);
+
+        #endregion
+
+        #region Property Interface
+
+        /// <summary>
+        /// Returns whether or not the player can end the turn. Used for AI players
+        /// </summary>
+        /// 
+        /// <returns>Whether or not the player can end the turn.</returns>
+        public static bool CanEndTurn() => OwnerFrame.CanEndTurn();
+
+        /// <summary>
+        /// Returns whether or not the player can end the game. Used for AI players
+        /// </summary>
+        /// 
+        /// <returns>Whether or not the player can end the game.</returns>
+        public static bool CanEndGame() => OwnerFrame.CanEndGame();
+
+        /// <summary>
+        /// Updates the list of players
+        /// </summary>
+        public static void UpdatePlayerList() => OwnerFrame.UpdatePlayerList();
+
+        /// <summary>
+        /// Refresh the owning panel to display and updates
+        /// </summary>
+        public static void Refresh() => OwnerFrame.Refresh();
+
+        /// <summary>
+        /// Clears out all the squares and updates the panel with the new hand
+        /// </summary>
+        /// 
+        /// <param name="squares">List of squares to add to the panel</param>
+        public static void SetHand(List<Square> squares)
+        {
+            OwnerFrame.GetHandPanel().SetHand(squares);
+        }
 
         #endregion
     }

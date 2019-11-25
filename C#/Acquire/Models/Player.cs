@@ -52,7 +52,7 @@ namespace Acquire.Models
         /// <summary>
         /// Creates a player with the given name <paramref name="name"/> and <paramref name="type"/>
         /// <para>
-        /// Initilizes majority/minority holdings to false, and company shares to 0
+        /// Initializes majority/minority holdings to false, and company shares to 0
         /// </para>
         /// </summary>
         /// 
@@ -99,7 +99,7 @@ namespace Acquire.Models
 
                         if (!openingShare)
                         {
-                            LogMaster.DynamicLog(Name + " bought " + LogMaster.DynamicContent(Name + company.Name + "Buy", LogMaster.STANDARD_NUPROG, 1, "Buy") + " " + LogMaster.DynamicContent(Name + company.Name + "Shares", LogMaster.SHARES, 1, LogMaster.SHARES_TYPE) + " of " + company.Name + ".");
+                            LogMaster.DynamicLog(Name + " bought " + LogMaster.DynamicContent(Name + company.Name + "Buy", LogMaster.STANDARD_NUM_PROGRESSION, 1, "Buy") + " " + LogMaster.DynamicContent(Name + company.Name + "Shares", LogMaster.SHARES, 1, LogMaster.SHARES_TYPE) + " of " + company.Name + ".");
                         }
                         else
                         {
@@ -109,7 +109,7 @@ namespace Acquire.Models
                         // Update the company's holders with this player
                         company.UpdateHolders(this);
 
-                        Game.OwnerFrame.UpdatePlayerList();
+                        Game.UpdatePlayerList();
                     }
                     else
                     {
@@ -146,7 +146,7 @@ namespace Acquire.Models
                     int sellPrice = company.SellShare(companySize);
                     Money += sellPrice;
 
-                    string dynamicSold = LogMaster.DynamicContent(Name + company.Name + "Sold", LogMaster.STANDARD_NUPROG, 1, "Sold");
+                    string dynamicSold = LogMaster.DynamicContent(Name + company.Name + "Sold", LogMaster.STANDARD_NUM_PROGRESSION, 1, "Sold");
                     string dynamicShares = LogMaster.DynamicContent(Name + company.Name + "Shares", LogMaster.SHARES, 1, LogMaster.SHARES_TYPE);
                     LogMaster.DynamicLog($"{Name} sold {dynamicSold} {dynamicShares} of {company.Name} for {sellPrice:C0}.");
 
@@ -186,8 +186,8 @@ namespace Acquire.Models
                 SetShares(deadCompany, GetShares(deadCompany) - numShares * 2);
 
                 // Update the company sizes
-                deadCompany.Shares = deadCompany.Shares + numShares * 2;
-                liveCompany.Shares = liveCompany.Shares - numShares;
+                deadCompany.Shares += numShares * 2;
+                liveCompany.Shares -= numShares;
             }
             // Otherwise...
             else
@@ -201,8 +201,8 @@ namespace Acquire.Models
                 SetShares(deadCompany, 0);
 
                 // Update the company sizes
-                deadCompany.Shares = deadCompany.Shares + sharesTraded;
-                liveCompany.Shares = liveCompany.Shares - sharesTraded / 2;
+                deadCompany.Shares += sharesTraded;
+                liveCompany.Shares -= sharesTraded / 2;
             }
         }
 
@@ -232,8 +232,13 @@ namespace Acquire.Models
 
         #region Set Methods
 
-        /// <inheritdoc />
-        public void SetShares(Company company, int numShares)
+        /// <summary>
+        /// Sets the amount of shares this player has in the company <paramref name="company"/> to <paramref name="numShares"/>
+        /// </summary>
+        /// 
+        /// <param name="company">The company whose shares we are updating</param>
+        /// <param name="numShares">The amount of shares to be stored for the given company</param>
+        private void SetShares(Company company, int numShares)
         {
             shares[company.Name.ToLower()] = numShares;
         }
@@ -250,6 +255,12 @@ namespace Acquire.Models
             isMinorityHolder[companyName.ToLower()] = isPlayerMinorityHolder;
         }
 
+        /// <inheritdoc />
+        public void CanPlaceSquare(bool canPlayerPlaceSquare)
+        {
+            canPlaceSquare = canPlayerPlaceSquare;
+        }
+
         #endregion
 
         #region Boolean Methods
@@ -263,12 +274,6 @@ namespace Acquire.Models
             }
 
             return canPlaceSquare;
-        }
-
-        /// <inheritdoc />
-        public void CanPlaceSquare(bool canPlayerPlaceSquare)
-        {
-            canPlaceSquare = canPlayerPlaceSquare;
         }
 
         /// <inheritdoc />

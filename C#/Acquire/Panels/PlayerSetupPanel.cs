@@ -282,7 +282,7 @@ namespace Acquire.Panels
 
             if (GetPlayerType() == PlayerType.AI)
             {
-                return new AiPlayer(GetName(), PlayerId);
+                return new DumbBot(GetName(), PlayerId);
             }
 
             return new RemotePlayer(PlayerId, GetAddress(), IsHost());

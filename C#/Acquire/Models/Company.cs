@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
 using Acquire.Components;
+using Acquire.Models.Interfaces;
 
 namespace Acquire.Models
 {
@@ -14,8 +15,8 @@ namespace Acquire.Models
         private bool isSafe;
 
         // A list of the company's majority and minority holders
-        private readonly List<Player> majorityHolders;
-        private readonly List<Player> minorityHolders;
+        private readonly List<IPlayer> majorityHolders;
+        private readonly List<IPlayer> minorityHolders;
 
         #endregion
 
@@ -94,8 +95,8 @@ namespace Acquire.Models
             Color = companyColor;
 
             ImageIcon = imageIcon;
-            majorityHolders = new List<Player>();
-            minorityHolders = new List<Player>();
+            majorityHolders = new List<IPlayer>();
+            minorityHolders = new List<IPlayer>();
         }
 
         #region Action Methods
@@ -152,12 +153,12 @@ namespace Acquire.Models
             Size = size;
 
             // Give all majority holders their bonus
-            foreach (Player player in majorityHolders)
+            foreach (IPlayer player in majorityHolders)
             {
                 player.GiveMoney(GetPrice() * 10 / majorityHolders.Count);
             }
             // Give all minority holders their bonus
-            foreach (Player player in minorityHolders)
+            foreach (IPlayer player in minorityHolders)
             {
                 player.GiveMoney(GetPrice() * 5 / majorityHolders.Count);
             }
@@ -178,11 +179,11 @@ namespace Acquire.Models
         public void UpdateHolders(Player currentPlayer, bool logChanges = false)
         {
             // Store the current majority holders as "old"
-            List<Player> oldMajorityHolders = new List<Player>(majorityHolders);
+            List<IPlayer> oldMajorityHolders = new List<IPlayer>(majorityHolders);
             // Store the current minority holders as "old"
-            List<Player> oldMinorityHolders = new List<Player>(minorityHolders);
+            List<IPlayer> oldMinorityHolders = new List<IPlayer>(minorityHolders);
             // Add the majority and minority holders to the list of all of them
-            List<Player> majorityAndMinorityHolders = new List<Player>(majorityHolders);
+            List<IPlayer> majorityAndMinorityHolders = new List<IPlayer>(majorityHolders);
             majorityAndMinorityHolders.AddRange(minorityHolders);
 
             // I this pPlayer isn't already in there, add them now.
@@ -192,7 +193,7 @@ namespace Acquire.Models
             }
 
             // Set the majority and minority holder status for every pPlayer to false
-            foreach (Player player in majorityAndMinorityHolders)
+            foreach (IPlayer player in majorityAndMinorityHolders)
             {
                 player.SetMajorityHolder(Name, false);
                 player.SetMinorityHolder(Name, false);
@@ -203,7 +204,7 @@ namespace Acquire.Models
             minorityHolders.Clear();
 
             // For each pPlayer being considered...
-            foreach (Player player in majorityAndMinorityHolders)
+            foreach (IPlayer player in majorityAndMinorityHolders)
             {
                 // Set the current majority to the lead holder if we have one
                 int currentMajShares = majorityHolders.Count != 0 ? majorityHolders[0].GetShares(Name) : 0;
@@ -254,7 +255,7 @@ namespace Acquire.Models
             }
 
             // Make sure each majority leader knows they are one
-            foreach (Player player in majorityHolders)
+            foreach (IPlayer player in majorityHolders)
             {
                 player.SetMajorityHolder(Name, true);
 
@@ -265,7 +266,7 @@ namespace Acquire.Models
             }
 
             // Make sure each minority leader knows they are one
-            foreach (Player player in minorityHolders)
+            foreach (IPlayer player in minorityHolders)
             {
                 player.SetMinorityHolder(Name, true);
 

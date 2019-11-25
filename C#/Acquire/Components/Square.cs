@@ -52,15 +52,6 @@ namespace Acquire.Components
         /// </summary>
         public Square BottomSquare { get; private set; }
 
-        /// <summary>
-        /// The X position of this square
-        /// </summary>
-        public int XPosition { get; set; }
-        /// <summary>
-        /// The Y position of this square
-        /// </summary>
-        public int YPosition { get; set; }
-
         #endregion
 
         #region Private Member Variables
@@ -200,7 +191,7 @@ namespace Acquire.Components
                                 // Remove this square from the player's hand
                                 Game.CurrentPlayer.Squares.Remove(this);
                                 // Update the hand panel to show the player what he has
-                                Game.OwnerFrame.GetHandPanel().SetHand(Game.CurrentPlayer.Squares);
+                                Game.SetHand(Game.CurrentPlayer.Squares);
 
                                 // This square can't be placed because it already has been.
                                 CanBePlaced = false;

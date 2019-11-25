@@ -132,8 +132,8 @@ namespace Acquire.Panels
         }
 
         /// <summary>
-        /// Places the given square on the board. Handles unplaceable squares,
-        /// forming new companies, growing existing companies, and merging multiple compnaies together.
+        /// Places the given square on the board. Handles un-placeable squares,
+        /// forming new companies, growing existing companies, and merging multiple companies together.
         /// 
         /// Returns null if the square was not able to be places, an arbitrary value otherwise
         /// </summary>
@@ -212,7 +212,7 @@ namespace Acquire.Panels
             // and only give them squares if there are some to give
             while (squares.Count < 10 && SquareBag.Count > 0)
             {
-                // Don't give unplaceable squares
+                // Don't give un-placeable squares
                 if (SquareBag[0].CanBePlaced)
                 {
                     squares.Add(SquareBag[0]);
@@ -236,7 +236,7 @@ namespace Acquire.Panels
         public void UpdateHeldSquares(IPlayer player)
         {
             // Update the hand panel too
-            Game.OwnerFrame.GetHandPanel().SetHand(player.Squares);
+            Game.SetHand(player.Squares);
 
             // Go through each square
             for (int i = 0; i < Squares.GetLength(0); i++)
@@ -276,7 +276,7 @@ namespace Acquire.Panels
 
         /// <summary>
         /// Handles the merging of a list of squares with a new square.
-        /// Handles forming new companies, growing existing companies, and merging multiple compnaies together.
+        /// Handles forming new companies, growing existing companies, and merging multiple companies together.
         /// 
         /// Returns null if the square was not able to be places, an arbitrary value otherwise
         /// </summary>
@@ -298,7 +298,7 @@ namespace Acquire.Panels
             // Whether the company being formed is new, or just merging with another one
             bool isNewCompany = false;
 
-            // While we still ahve squares to look at
+            // While we still have squares to look at
             while (squares.Count != 0)
             {
                 // Get the first one
@@ -388,7 +388,7 @@ namespace Acquire.Panels
             // If the player is an AI, let them choose a company without the GUI
             else if (Game.CurrentPlayer.Type == PlayerType.AI)
             {
-                newCompany = ((AiPlayer)Game.CurrentPlayer).ChooseCompany(options);
+                newCompany = ((IAIPlayer)Game.CurrentPlayer).ChooseCompany(options);
             }
             else
             {
@@ -425,7 +425,7 @@ namespace Acquire.Panels
                         // If it's an AI, let them handle it without the GUI
                         else
                         {
-                            ((AiPlayer)player).HandleMerge(newCompany, company);
+                            ((IAIPlayer)player).HandleMerge(newCompany, company);
                         }
                     }
 
@@ -474,7 +474,7 @@ namespace Acquire.Panels
             // Increment the size of the company
             newCompany.Size++;
             // Redraw the frame
-            Game.OwnerFrame.Refresh();
+            Game.Refresh();
             // Get the current player
             IPlayer player = Game.CurrentPlayer;
             // If this company is in the active list, it isn't new
@@ -532,7 +532,7 @@ namespace Acquire.Panels
         /// </summary>
         ///
         /// <param name="size">The initial size of the square</param>
-        /// <param name="multiplier">The muliplier indicating the relative grid position</param>
+        /// <param name="multiplier">The multiplier indicating the relative grid position</param>
         ///
         /// <returns>The adjusted position based on the <paramref name="size"/> and <paramref name="multiplier"/></returns>
         private static int GetSquareLocationFromSize(int size, int multiplier)

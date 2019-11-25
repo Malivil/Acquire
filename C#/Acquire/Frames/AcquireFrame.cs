@@ -23,7 +23,7 @@ namespace Acquire.Frames
         /// Creates a new Acquire game using the list of players provided
         /// </summary>
         /// 
-        /// <param name="players">Thye list of players for this game</param>
+        /// <param name="players">The list of players for this game</param>
         public AcquireFrame(List<IPlayer> players)
         {
             InitializeComponent();
@@ -68,7 +68,7 @@ namespace Acquire.Frames
 
         /// <summary>
         /// Sets the log box to the last line when the frame is painted.
-        /// (Only really useful when AI players play eachother as this isn't painted untl the game is already over)
+        /// (Only really useful when AI players play each-other as this isn't painted until the game is already over)
         /// </summary>
         /// 
         /// <param name="sender">The object sending the event</param>

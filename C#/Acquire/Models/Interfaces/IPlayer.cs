@@ -109,14 +109,6 @@ namespace Acquire.Models.Interfaces
         #region Set Methods
 
         /// <summary>
-        /// Sets the amount of shares this player has in the company <paramref name="company"/> to <paramref name="numShares"/>
-        /// </summary>
-        /// 
-        /// <param name="company">The company whose shares we are updating</param>
-        /// <param name="numShares">The amount of shares to be stored for the given company</param>
-        void SetShares(Company company, int numShares);
-
-        /// <summary>
         /// Sets whether or not this player is a majority holder for the company named <paramref name="companyName"/>
         /// </summary>
         /// 

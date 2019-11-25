@@ -16,7 +16,7 @@ namespace Acquire
         /// The array holding the number progression for sentence structure.
         /// 30 is the max because companies can only have up to 30 shares.
         /// </summary>
-        public static readonly string[] STANDARD_NUPROG = {"a", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30"};
+        public static readonly string[] STANDARD_NUM_PROGRESSION = {"a", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30"};
 
         /// <summary>
         /// Indicates a normal log message with no logic
@@ -41,19 +41,13 @@ namespace Acquire
         // The last string logged
         private static string lastLog = "";
 
-        // The type of the last string
-        private static string lastDynamicType = "";
-
         // The type of the last string logged
         private static string lastLogType = "";
 
         // The last dynamic strings
         private static string[] lastDynamic = new string[2];
 
-        // The current numbers for dynmic logging
-        private static readonly Dictionary<string, int> STORED_NUMBERS = new Dictionary<string, int>();
-
-        // The current strings for dynmic logging
+        // The current strings for dynamic logging
         private static readonly Dictionary<string, string[]> STORED_STRINGS = new Dictionary<string, string[]>();
 
         // Whether or not the last string is being replaced
@@ -78,7 +72,7 @@ namespace Acquire
             {
                 // Add the text to the box
                 listBox.Items.Add($"\n> {log}");
-                // SCroll to the bottom
+                // Scroll to the bottom
                 listBox.TopIndex = listBox.Items.Count - listBox.Height / listBox.ItemHeight;
                 // Save the string for later
                 lastLog = log;
@@ -88,7 +82,7 @@ namespace Acquire
         }
 
         /// <summary>
-        /// Logs content dynmically. If <see cref="isBeingReplaced"/> is true, it replaces the last line with the new line.
+        /// Logs content dynamically. If <see cref="isBeingReplaced"/> is true, it replaces the last line with the new line.
         /// </summary>
         /// 
         /// <param name="log">The string to be logged</param>
@@ -103,79 +97,12 @@ namespace Acquire
 
             // Add the text to the box
             listBox.Items.Add($"\n> {log}");
-            // SCroll to the bottom
+            // Scroll to the bottom
             listBox.TopIndex = listBox.Items.Count - listBox.Height / listBox.ItemHeight;
             // Save the string for later
             lastLog = log;
             // Save the type for later
             lastLogType = DYNAMIC_TYPE;
-        }
-
-        /// <summary>
-        /// Creates dynamic content based on the given key, start position, increment size, and type
-        /// </summary>
-        /// 
-        /// <param name="key">The key used when storing and incrementing</param>
-        /// <param name="start">Where to start from</param>
-        /// <param name="increment">How much to increment by</param>
-        /// <param name="type">The type of this content</param>
-        /// 
-        /// <returns>A dynamically constructed string</returns>
-        public static string DynamicContent(string key, int start, int increment, string type)
-        {
-            // The string to output, starts blank.
-            string output = "";
-
-            // If we haven't used this key before
-            if (!STORED_NUMBERS.ContainsKey(key))
-            {
-                // Store it
-                STORED_NUMBERS.Add(key, start);
-                // The starting size is all there is at this point
-                output += start;
-            }
-            // Otherwise
-            else
-            {
-                // If this is about Shares, get the last dynamic shares, otherwise get the other one
-                string lastDyn = type.Equals(SHARES_TYPE) ? lastDynamic[0] : lastDynamic[1];
-
-                // If the current key isn't the same as the last dynamic entry, reset it
-                if (!key.Equals(lastDyn) || !lastLogType.Equals(DYNAMIC_TYPE))
-                {
-                    // Start fresh with this new key
-                    STORED_NUMBERS.Clear();
-                    STORED_NUMBERS.Add(key, start);
-                    output += start;
-                }
-                // Otherwise
-                else
-                {
-                    // Increment the stored count by the given amount
-                    STORED_NUMBERS[key] += increment;
-                    output += STORED_NUMBERS[key];
-                    // Set this up to be replaced in the log
-                    isBeingReplaced = true;
-                }
-            }
-
-            // Store the last used key for the current type
-            if (type.Equals(SHARES_TYPE))
-            {
-                lastDynamic[0] = key;
-            }
-            else
-            {
-                lastDynamic[1] = key;
-            }
-
-            // If this isn't a shares type, store what it is
-            if (!type.Equals(SHARES_TYPE))
-            {
-                lastDynamicType = type;
-            }
-
-            return output;
         }
 
         /// <summary>
@@ -255,12 +182,6 @@ namespace Acquire
                 lastDynamic[1] = key;
             }
 
-            // If this isn't a shares type, store what it is
-            if (!type.Equals(SHARES_TYPE))
-            {
-                lastDynamicType = type;
-            }
-
             return output;
         }
 
@@ -269,19 +190,14 @@ namespace Acquire
         /// </summary>
         /// 
         /// <param name="strings">Whether or not to clear the strings</param>
-        /// <param name="numbers">Whether or not to clear the numbers</param>
-        public static void ClearDynamicContent(bool strings, bool numbers)
+        public static void ClearDynamicContent(bool strings = true)
         {
             if (strings)
             {
                 STORED_STRINGS.Clear();
             }
-            if (numbers)
-            {
-                STORED_NUMBERS.Clear();
-            }
 
-            if (strings || numbers)
+            if (strings)
             {
                 lastDynamic = new string[2];
                 isBeingReplaced = false;

@@ -6,7 +6,7 @@ using Acquire.Models.Interfaces;
 
 namespace Acquire.Models
 {
-    public class AiPlayer : Player, IAIPlayer
+    public class DumbBot : Player, IAIPlayer
     {
         /// <summary>
         /// Creates a new Player with the AI type
@@ -14,7 +14,7 @@ namespace Acquire.Models
         /// 
         /// <param name="name">The name to give this AI player</param>
         /// <param name="playerId">The unique id of this player.</param>
-        public AiPlayer(string name, string playerId) : base(name, PlayerType.AI, playerId, false) { }
+        public DumbBot(string name, string playerId) : base(name, PlayerType.AI, playerId, false) { }
 
         #region Action Methods
 
@@ -31,13 +31,13 @@ namespace Acquire.Models
             }
 
             // If we can end the game, do so
-            if (Game.OwnerFrame.CanEndGame())
+            if (Game.CanEndGame())
             {
                 Game.EndGame();
                 return;
             }
             // If we can't end the game, but we can end our turn do so
-            if (Game.OwnerFrame.CanEndTurn())
+            if (Game.CanEndTurn())
             {
                 Game.NextTurn();
                 return;

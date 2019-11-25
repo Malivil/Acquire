@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Acquire</RootNamespace>
     <AssemblyName>Acquire</AssemblyName>
-    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
@@ -81,7 +81,7 @@
     </Compile>
     <Compile Include="NetworkModels\Disconnect.cs" />
     <Compile Include="NetworkModels\AcquireNetworkModel.cs" />
-    <Compile Include="Models\AIPlayer.cs" />
+    <Compile Include="Models\DumbBot.cs" />
     <Compile Include="Forms\BuyShareForm.cs">
       <SubType>Form</SubType>
     </Compile>
